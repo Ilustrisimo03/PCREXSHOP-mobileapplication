@@ -78,9 +78,9 @@ const styles = StyleSheet.create({
 	    height: 2, // Bahagyang mas malaki ang anino
     },
     shadowOpacity: 0.1, // Mas subtle na anino
-    shadowRadius: 4,
+    shadowRadius: 1,
     // Ang elevation ay para sa Android
-    elevation: Platform.OS === 'android' ? 3 : 0, 
+    elevation: Platform.OS === 'android' ? 1 : 0, 
   },
   imageContainer: {
     width: '100%',

@@ -4,8 +4,8 @@ import { View, Text, StyleSheet, ActivityIndicator, Dimensions } from 'react-nat
 const LoadingScreen = ({ navigation }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
-      // Mag-navigate sa SignIn_SignUp screen pagkatapos ng 3 segundo
-      navigation.replace('SingIn_SignUp');
+      // Mag-navigate sa Home screen after 3sec
+      navigation.replace('HomeScreen');
     }, 3000);
 
     return () => clearTimeout(timer);
@@ -24,15 +24,15 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#1C1C1E',
+    backgroundColor: '#E31C25',
     padding: 20,
   },
   logoText: {
     color: '#FFFFFF',
-    fontSize: 48,
+    fontSize: 20,
     fontWeight: 'bold',
     letterSpacing: 2,
-    textTransform: 'uppercase',
+    
   },
   spinner: {
     marginTop: 20,

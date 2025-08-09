@@ -1,13 +1,13 @@
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-
+// import { CartProvider } from './context/CartContext';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import 'react-native-gesture-handler';
 
 // I-import ang iyong mga screen
-import Home from "./Screen/Home";
+import HomeScreen from "./Screen/HomeScreen";
 import Cart from "./Screen/Cart";
 import CategoryProducts from "./Screen/CategoryProducts";
 import ProductDetails from "./Screen/ProducDetails";
@@ -27,11 +27,11 @@ const TabNavigator = () => {
       screenOptions={{
         tabBarStyle: {
           position: 'absolute',
-          bottom: 15,
+          
           left: 15,
           right: 15,
           height: 65,
-          borderRadius: 30,
+       
           shadowColor: '#000',
           shadowOffset: { width: 0, height: -3 },
           shadowOpacity: 0.1,
@@ -57,7 +57,7 @@ const TabNavigator = () => {
     >
       <Tab.Screen
         name="Home"
-        component={Home}
+        component={HomeScreen}
         options={{
           tabBarIcon: ({ focused, color, size }) => (
             <Icon
@@ -102,8 +102,9 @@ const TabNavigator = () => {
 // Main Stack Navigator
 const App = () => {
   return (
+    // <CartProvider>
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
+      <Stack.Navigator initialRouteName="LoadingScreen">
         {/* Mga screen bago ang authentication */}
         <Stack.Screen name="LoadingScreen" component={LoadingScreen} options={{ headerShown: false }} />
          <Stack.Screen name="Cart" component={Cart} options={{ headerShown: false }} />
@@ -114,12 +115,13 @@ const App = () => {
         <Stack.Screen name="Products" component={Products} options={{ headerShown: false }} />
         {/* Main Application Screens pagkatapos mag-login (nakapaloob sa Tab Navigator) */}
         <Stack.Screen
-          name="Home"
+          name="HomeScreen"
           component={TabNavigator}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
     </NavigationContainer>
+      // {/* </CartProvider> */}
   );
 };
 
