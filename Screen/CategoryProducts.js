@@ -9,23 +9,37 @@ import {
     StatusBar,
     TextInput
 } from 'react-native';
+import { useFonts } from 'expo-font'; // Import the useFonts hook
+import { useCart } from '../context/CartContext'; // Already imported, great!
 import ProductCard from '../Components/ProductCard'; // Ang component na ito ay dapat ayusin
 import Item from '../data/Item.json';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+
 
 // THEME (Consistent sa HomeScreen)
 const THEME = {
   primary: '#E31C25',
   background: '#FFFFFF',
   text: '#1C1C1C',
-  cardBackground: '#FFFFFF'
+  cardBackground: '#FFFFFF',
+  icons: '#FFFFFF'
 };
 
 const CategoryProducts = ({ route, navigation }) => {
+   // Load custom fonts
+    const [fontsLoaded] = useFonts({
+      'Roboto-Regular': require('../assets/fonts/Roboto/static/Roboto_Condensed-Regular.ttf'),
+      'Roboto-Bold': require('../assets/fonts/Roboto/static/Roboto_Condensed-Bold.ttf'),
+      'Roboto-Medium': require('../assets/fonts/Roboto/static/Roboto_Condensed-Medium.ttf'),
+      'Roboto-SemiBold': require('../assets/fonts/Roboto/static/Roboto_Condensed-SemiBold.ttf'), // Make sure this font file exists
+    });
+
   const { categoryName } = route.params;
   
   const [products, setProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const { itemCount } = useCart();
+  
 
   useEffect(() => {
     let baseProducts = [];
@@ -48,6 +62,12 @@ const CategoryProducts = ({ route, navigation }) => {
     }
   }, [categoryName, searchQuery]);
 
+
+    // Wait until the fonts are loaded before rendering the screen
+  if (!fontsLoaded) {
+    return null; // Or you can return a loading indicator here
+  }
+
   // Dito, ipinapasa natin ang buong 'item' sa ProductCard at ProductDetails.
   // DAPAT mong siguraduhin na ang 'ProductCard.js' ay gumagamit na rin ng 'item.images[0]'.
   const renderProduct = ({ item }) => (
@@ -58,6 +78,8 @@ const CategoryProducts = ({ route, navigation }) => {
         />
     </View>
   );
+
+  
 
   return (
     <SafeAreaView style={styles.container}>
@@ -79,12 +101,24 @@ const CategoryProducts = ({ route, navigation }) => {
                 />
             </View>
             
+            {/* --- UPDATED CART ICON WITH BADGE --- */}
             <TouchableOpacity onPress={() => navigation.navigate('Cart')}>
-                <Icon name="cart-outline" size={28} color={THEME.cardBackground} style={styles.headerIcon} />
+                <View>
+                    <Icon name="cart-outline" size={28} color={THEME.icons} />
+                    {itemCount > 0 && (
+                      <View style={styles.badgeContainer}>
+                        <Text style={styles.badgeText}>{itemCount}</Text>
+                      </View>
+                    )}
+                </View>
             </TouchableOpacity>
             <TouchableOpacity>
                 <Icon name="account-outline" size={28} color={THEME.cardBackground} style={styles.headerIcon} />
             </TouchableOpacity>
+        </View>
+
+         <View style={styles.titleContainer}>
+            <Text style={styles.titleText}>{categoryName}</Text>
         </View>
 
         <FlatList
@@ -128,10 +162,40 @@ const styles = StyleSheet.create({
         flex: 1, 
         paddingHorizontal: 10, 
         fontSize: 14, 
-        color: THEME.text 
+        color: THEME.text ,
+        fontFamily: 'Roboto-Regular'
     },
     headerIcon: { 
         marginLeft: 4
+    },
+     // --- ADDED STYLES FOR THE BADGE ---
+  badgeContainer: {
+    position: 'absolute',
+    top: -4,
+    right: -6,
+    backgroundColor: THEME.background,
+    borderRadius: 9,
+    width: 18,
+    height: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: THEME.background
+  },
+  badgeText: {
+    color: THEME.primary,
+    fontSize: 12,
+    fontFamily: 'Roboto-Bold',
+  },
+    titleContainer: {
+        paddingHorizontal: 20,
+        paddingTop: 16,
+        backgroundColor: THEME.background,
+    },
+    titleText: {
+        fontSize: 18,
+        fontFamily: 'Roboto-Medium',
+        color: THEME.text,
     },
     gridCardContainer: { 
         width: '50%', 
@@ -145,6 +209,7 @@ const styles = StyleSheet.create({
     },
     noResultsText: { 
         fontSize: 16, 
+        fontFamily: 'Roboto-Medium',
         color: '#6c757d' 
     },
 });

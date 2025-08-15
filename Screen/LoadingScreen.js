@@ -1,20 +1,90 @@
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Dimensions } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { 
+    View, 
+    StyleSheet, 
+    Animated, 
+    Image, 
+    StatusBar 
+} from 'react-native';
 
 const LoadingScreen = ({ navigation }) => {
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      // Mag-navigate sa Home screen after 3sec
-      navigation.replace('HomeScreen');
-    }, 3000);
+  // useRef to store animated values for the logo and text
+  const logoAnimation = useRef(new Animated.Value(0)).current;
+  const textAnimation = useRef(new Animated.Value(0)).current;
 
-    return () => clearTimeout(timer);
+  useEffect(() => {
+    // Navigate to home screen after animations have time to complete
+    const navigationTimer = setTimeout(() => {
+      navigation.replace('HomeScreen');
+    }, 5000);
+
+    // Start the animation sequence
+    startAnimations();
+
+    return () => clearTimeout(navigationTimer);
   }, [navigation]);
+
+  const startAnimations = () => {
+    // Use Animated.parallel to run multiple animations simultaneously
+    Animated.parallel([
+      // Animation for the logo (zoom in and fade in)
+      Animated.timing(logoAnimation, {
+        toValue: 1,
+        duration: 1200, // Animation duration of 1.2 seconds
+        useNativeDriver: true,
+      }),
+      // Animation for the text (slide up and fade in)
+      Animated.timing(textAnimation, {
+        toValue: 1,
+        duration: 1000, // Slightly shorter duration
+        delay: 500,    // Start after a 500ms delay
+        useNativeDriver: true,
+      })
+    ]).start();
+  };
+
+  // Interpolated styles for the logo animation
+  const logoAnimatedStyle = {
+    opacity: logoAnimation,
+    transform: [
+      {
+        scale: logoAnimation.interpolate({
+          inputRange: [0, 1],
+          outputRange: [0.8, 1], // Start at 80% size and scale to 100%
+        }),
+      },
+    ],
+  };
+
+  // Interpolated styles for the text animation
+  const textAnimatedStyle = {
+    opacity: textAnimation,
+    transform: [
+      {
+        translateY: textAnimation.interpolate({
+          inputRange: [0, 1],
+          outputRange: [20, 0], // Move up by 20 pixels
+        }),
+      },
+    ],
+  };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.logoText}>PCREXSHOP</Text>
-      <ActivityIndicator size="large" color="#FFFFFF" style={styles.spinner} />
+      <StatusBar barStyle="dark-content" backgroundColor='#FFFFFF'/>
+      <Animated.View style={logoAnimatedStyle}>
+        <Image 
+          source={require('../assets/pcrexlogo.png')} // Make sure this path is correct
+          style={styles.logo} 
+          resizeMode="contain"
+        />
+      </Animated.View>
+      
+      <Animated.Text style={[styles.logoText, textAnimatedStyle]}>
+        PC Rex Shop
+      </Animated.Text>
+      
+      
     </View>
   );
 };
@@ -24,19 +94,19 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#E31C25',
-    padding: 20,
+    backgroundColor: '#FFFFFF',
+  },
+  logo: {
+    width: 150, // Adjust width as needed
+    height: 150, // Adjust height as needed
   },
   logoText: {
-    color: '#FFFFFF',
+    color: '#1C1C1C',
     fontSize: 20,
     fontWeight: 'bold',
-    letterSpacing: 2,
-    
+    bottom: 40,
   },
-  spinner: {
-    marginTop: 20,
-  },
+  
 });
 
 export default LoadingScreen;

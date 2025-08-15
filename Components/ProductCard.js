@@ -7,6 +7,8 @@ import {
   Animated, // <-- Mahalaga para sa animation
   Platform // <-- Para sa pag-check ng OS (optional but good practice)
 } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useFonts } from 'expo-font'; // Import the useFonts hook
 
 const THEME = {
   COLORS: {
@@ -20,6 +22,23 @@ const THEME = {
 
 // Helper function para sa presyo
 const formatPrice = (price) => {
+
+     // Load custom fonts
+        const [fontsLoaded] = useFonts({
+          'Roboto-Regular': require('../assets/fonts/Roboto/static/Roboto_Condensed-Regular.ttf'),
+          'Roboto-Bold': require('../assets/fonts/Roboto/static/Roboto_Condensed-Bold.ttf'),
+          'Roboto-Medium': require('../assets/fonts/Roboto/static/Roboto_Condensed-Medium.ttf'),
+          'Roboto-SemiBold': require('../assets/fonts/Roboto/static/Roboto_Condensed-SemiBold.ttf'), // Make sure this font file exists
+        });
+  
+  
+        
+      // Wait until the fonts are loaded before rendering the screen
+    if (!fontsLoaded) {
+      return null; // Or you can return a loading indicator here
+    }
+
+
   const priceNumber = parseFloat(price);
   if (isNaN(priceNumber)) {
     return '₱--.--'; // Fallback kung sakaling hindi valid ang presyo
@@ -54,6 +73,11 @@ const ProductCard = ({ product, onPress }) => {
         <View style={styles.infoContainer}>
           <Text style={styles.name} numberOfLines={2}>{product.name}</Text>
           <Text style={styles.price}>{formatPrice(product.price)}</Text>
+           {/* Rating */}
+                      <View style={styles.infoBox}>
+                          <Icon name="star" size={12} color="#FFC700" />
+                          <Text style={styles.infoText}>{product.rate} Stars</Text>
+                      </View>
         </View>
       </TouchableOpacity>
     </Animated.View>
@@ -99,7 +123,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     // Ang font family ay dapat naka-setup sa buong app. Kung wala pa, safe na alisin muna ito.
     // fontFamily: 'Poppins-SemiBold', 
-    fontWeight: '600', // Alternative sa custom font
+   fontFamily: 'Roboto-Medium',
     height: 40, 
     lineHeight: 18, // Para mas maayos ang itsura ng multi-line text
   },
@@ -107,8 +131,17 @@ const styles = StyleSheet.create({
     color: THEME.COLORS.primary,
     fontSize: 16,
     // fontFamily: 'Poppins-Bold',
-    fontWeight: '600', // Alternative sa custom font
+   fontFamily: 'Roboto-Medium',
     marginTop: 4,
+  },
+  infoBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  infoText: {
+    fontSize: 11,
+    color: '#333',
+    fontFamily: 'Roboto-Regular',
   },
 });
 

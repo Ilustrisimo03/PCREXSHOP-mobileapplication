@@ -12,6 +12,8 @@ import {
   Dimensions
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useFonts } from 'expo-font';
+import { useCart } from '../context/CartContext'; // Already imported, great!
 
 // THEME
 const THEME = {
@@ -20,20 +22,35 @@ const THEME = {
   text: '#1C1C1C',
 };
 
-// Kinukuha natin ang lapad ng screen para gawing full-width ang bawat image sa carousel
 const { width: screenWidth } = Dimensions.get('window');
 
 const ProductDetails = ({ route, navigation }) => {
   const { product } = route.params;
+  // Destructure itemCount along with the other functions
+  const { addToCart, buyNow, itemCount } = useCart();
 
-  // State para malaman kung anong image ang kasalukuyang nakikita
+  const [fontsLoaded] = useFonts({
+    'Roboto-Regular': require('../assets/fonts/Roboto/static/Roboto_Condensed-Regular.ttf'),
+    'Roboto-Bold': require('../assets/fonts/Roboto/static/Roboto_Condensed-Bold.ttf'),
+    'Roboto-Medium': require('../assets/fonts/Roboto/static/Roboto_Condensed-Medium.ttf'),
+    'Roboto-SemiBold': require('../assets/fonts/Roboto/static/Roboto_Condensed-SemiBold.ttf'),
+  });
+
   const [activeIndex, setActiveIndex] = useState(0);
 
+  if (!fontsLoaded) {
+    return null;
+  }
+
   const handleAddToCart = () => {
-    alert(`${product.name} has been added to your cart!`);
+    addToCart(product);
   };
 
-  // Function na nag-u-update ng activeIndex tuwing nag-i-scroll
+  const handleBuyNow = () => {
+    buyNow(product);
+    navigation.navigate('Cart');
+  };
+
   const onViewableItemsChanged = useCallback(({ viewableItems }) => {
       if (viewableItems.length > 0) {
           setActiveIndex(viewableItems[0].index || 0);
@@ -52,21 +69,28 @@ const ProductDetails = ({ route, navigation }) => {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Icon name="arrow-left" size={28} color={THEME.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{product.name}</Text>
+        <Text style={styles.headerTitle}>Details</Text>
+        
+        {/* --- UPDATED CART ICON WITH BADGE --- */}
         <TouchableOpacity onPress={() => navigation.navigate('Cart')}>
+          <View>
             <Icon name="cart-outline" size={28} color={THEME.text} />
+            {itemCount > 0 && (
+              <View style={styles.badgeContainer}>
+                <Text style={styles.badgeText}>{itemCount}</Text>
+              </View>
+            )}
+          </View>
         </TouchableOpacity>
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContentContainer}>
-        {/* --- IMAGE CAROUSEL SECTION --- */}
         <View style={styles.carouselContainer}>
           <FlatList
             data={product.images}
             renderItem={({ item }) => (
               <Image 
                 source={{ uri: item }} 
-                // BINAGO: Mula 'contain' naging 'cover' para sakupin ang buong space
                 style={styles.carouselImage} 
                 resizeMode="cover" 
               />
@@ -78,7 +102,6 @@ const ProductDetails = ({ route, navigation }) => {
             onViewableItemsChanged={onViewableItemsChanged}
             viewabilityConfig={viewabilityConfig}
           />
-          {/* Indicator Dots */}
           <View style={styles.indicatorContainer}>
             {product.images.map((_, index) => (
               <View
@@ -92,19 +115,15 @@ const ProductDetails = ({ route, navigation }) => {
           </View>
         </View>
         
-        {/* --- PRODUCT INFO SECTION --- */}
         <View style={styles.detailsContainer}>
           <Text style={styles.productName}>{product.name}</Text>
           <Text style={styles.productPrice}>₱ {parseFloat(product.price).toLocaleString()}</Text>
           
-          {/* --- IDINAGDAG: Row para sa Rating at Stock --- */}
           <View style={styles.infoRowContainer}>
-            {/* Rating */}
             <View style={styles.infoBox}>
                 <Icon name="star" size={20} color="#FFC700" />
                 <Text style={styles.infoText}>{product.rate} Stars</Text>
             </View>
-            {/* Stock */}
             <View style={styles.infoBox}>
                 <Icon name="package-variant-closed" size={20} color={THEME.primary} />
                 <Text style={styles.infoText}>{product.stock} in stock</Text>
@@ -117,11 +136,18 @@ const ProductDetails = ({ route, navigation }) => {
       </ScrollView>
 
       <View style={styles.bottomBar}>
-        <TouchableOpacity style={styles.addToCartButton} onPress={handleAddToCart}>
-          <Icon name="cart-plus" size={22} color={THEME.background} />
-          <Text style={styles.addToCartButtonText}>Add to Cart</Text>
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity style={styles.addToCartButton} onPress={handleAddToCart}>
+            <Icon name="cart-plus" size={22} color={THEME.background} />
+            <Text style={styles.addToCartButtonText}>Add to Cart</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.buyNowButton} 
+            onPress={handleBuyNow}
+          >
+            <Icon name="credit-card-outline" size={22} color={THEME.background} />
+            <Text style={styles.buyNowButtonText}>Buy Now</Text>
+          </TouchableOpacity>
+        </View>
     </SafeAreaView>
   );
 };
@@ -141,12 +167,31 @@ const styles = StyleSheet.create({
     borderBottomColor: '#EAEAEA' 
   },
   headerTitle: { 
-    fontSize: 15, 
-    fontWeight: '700', 
+    fontSize: 20, 
+    fontFamily: 'Roboto-Medium', 
     color: THEME.text 
   },
+  // --- ADDED STYLES FOR THE BADGE ---
+  badgeContainer: {
+    position: 'absolute',
+    top: -4,
+    right: -6,
+    backgroundColor: THEME.primary,
+    borderRadius: 9,
+    width: 18,
+    height: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: THEME.background
+  },
+  badgeText: {
+    color: THEME.background,
+    fontSize: 12,
+    fontFamily: 'Roboto-Bold',
+  },
   scrollContentContainer: {
-    paddingBottom: 20,
+    paddingBottom: 100,
   },
   carouselContainer: {
     height: 350,
@@ -175,24 +220,22 @@ const styles = StyleSheet.create({
     paddingTop: 20 
   },
   productName: { 
-    fontSize: 18, 
-    fontWeight: 'bold', 
+    fontSize: 22,
+    fontFamily: 'Roboto-Bold', 
     color: THEME.text, 
     marginBottom: 8 
   },
   productPrice: { 
-    fontSize: 16, 
-    fontWeight: '700', 
+    fontSize: 20,
+    fontFamily: 'Roboto-Medium',
     color: THEME.primary, 
     marginBottom: 16 
   },
-  // IDINAGDAG: Styles para sa bagong Info Row (Rating at Stock)
   infoRowContainer: {
     flexDirection: 'row',
-    justifyContent: 'flex-start',
     alignItems: 'center',
-    marginBottom: 20,
-    gap: 24, // Nagbibigay ng espasyo sa pagitan ng Rating at Stock
+    gap: 20,
+    marginBottom: 16,
   },
   infoBox: {
     flexDirection: 'row',
@@ -202,38 +245,64 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     fontSize: 14,
     color: '#333',
-    fontWeight: '500'
+    fontFamily: 'Roboto-Regular',
   },
   descriptionTitle: { 
-    fontSize: 16, 
-    fontWeight: 'bold', 
+    fontSize: 18, 
+    fontFamily: 'Roboto-Medium', 
     color: THEME.text, 
     marginBottom: 8,
-    marginTop: 10, // Nagdagdag ng kaunting space bago ang Description
+    marginTop: 10,
   },
   descriptionText: { 
-    fontSize: 14, 
-    color: '#333', 
-    lineHeight: 22 
+    fontSize: 15, 
+    color: '#4A4A4A', 
+    fontFamily: 'Roboto-Regular',
+    lineHeight: 23 
   },
   bottomBar: { 
-    padding: 16, 
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 12, 
+    paddingBottom: 20,
     borderTopWidth: 1, 
     borderTopColor: '#EAEAEA', 
     backgroundColor: THEME.background 
   },
   addToCartButton: { 
+    backgroundColor: '#ff8c00',
+    flexDirection: 'row', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    paddingVertical: 14, 
+    borderRadius: 10,
+    flex: 1,
+    marginRight: 8
+  },
+  addToCartButtonText: { 
+    color: THEME.background, 
+    fontSize: 16, 
+    fontFamily: 'Roboto-SemiBold', 
+    marginLeft: 10 
+  },
+  buyNowButton: { 
     backgroundColor: THEME.primary, 
     flexDirection: 'row', 
     justifyContent: 'center', 
     alignItems: 'center', 
-    paddingVertical: 15, 
-    borderRadius: 12 
+    paddingVertical: 14, 
+    borderRadius: 10,
+    flex: 1,
+    marginLeft: 8
   },
-  addToCartButtonText: { 
+  buyNowButtonText: { 
     color: THEME.background, 
-    fontSize: 15, 
-    fontWeight: 'bold', 
+    fontSize: 16, 
+    fontFamily: 'Roboto-SemiBold',
     marginLeft: 10 
   },
 });
