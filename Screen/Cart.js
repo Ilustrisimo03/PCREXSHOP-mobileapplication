@@ -5,7 +5,11 @@ import { useFonts } from 'expo-font';
 import { useCart } from '../context/CartContext';
 import { Swipeable } from 'react-native-gesture-handler';
 
+// --- (FIX 1) --- Removed 'route' from the component props
 const Cart = ({ navigation }) => {
+  // --- (FIX 2) --- Removed the line that caused the crash. The cart gets its data from useCart() below.
+  // const { product } = route.params; 
+
   const { cartItems, totalPrice, removeFromCart, clearCart } = useCart();
 
   const [fontsLoaded] = useFonts({
@@ -19,7 +23,6 @@ const Cart = ({ navigation }) => {
     return null;
   }
 
-  // This function defines the "Delete" button that appears when you swipe left.
   const renderRightActions = (progress, dragX, item) => {
     const trans = dragX.interpolate({
       inputRange: [-80, 0],
@@ -36,7 +39,14 @@ const Cart = ({ navigation }) => {
     );
   };
 
-  // The render function for each item now wraps the content in a Swipeable component.
+
+
+  // --- (FIX 3) --- Created a new handler for checkout.
+  // It doesn't need to call buyNow because the Checkout screen will read all cartItems from the context.
+  const handleProceedToCheckout = () => {
+    navigation.navigate('Checkout'); 
+  };
+
   const renderCartItem = ({ item }) => (
     <Swipeable renderRightActions={(progress, dragX) => renderRightActions(progress, dragX, item)}>
         <View style={styles.itemContainer}>
@@ -57,10 +67,9 @@ const Cart = ({ navigation }) => {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Icon name="arrow-left" size={28} color="#1C1C1C" />
+          <Icon name="chevron-left" size={28} color="#1C1C1C" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>My Cart</Text>
-        {/* The "Clear All" button only appears if there are items in the cart */}
         {cartItems.length > 0 ? (
           <TouchableOpacity onPress={clearCart}>
             <Text style={styles.clearAllButtonText}>Clear All</Text>
@@ -93,7 +102,8 @@ const Cart = ({ navigation }) => {
               <Text style={styles.totalLabel}>Total ({cartItems.length} items):</Text>
               <Text style={styles.totalPrice}>₱{totalPrice.toFixed(2)}</Text>
             </View>
-            <TouchableOpacity style={styles.checkoutButton}>
+            {/* --- (FIX 4) --- Changed the onPress to the new, correct handler. */}
+            <TouchableOpacity style={styles.checkoutButton} onPress={handleProceedToCheckout}>
               <Text style={styles.checkoutButtonText}>Proceed to Checkout</Text>
             </TouchableOpacity>
           </View>
@@ -103,6 +113,7 @@ const Cart = ({ navigation }) => {
   );
 };
 
+// Styles remain the same
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F8F9FA' },
   header: {
@@ -126,13 +137,13 @@ const styles = StyleSheet.create({
   subText: { fontSize: 16, color: '#888', fontFamily: 'Roboto-Regular', textAlign: 'center', marginTop: 8 },
   shopButton: { marginTop: 30, backgroundColor: '#E31C25', paddingVertical: 12, paddingHorizontal: 30, borderRadius: 8 },
   shopButtonText: { color: '#FFFFFF', fontSize: 16, fontFamily: 'Roboto-SemiBold' },
-  listContentContainer: { paddingHorizontal: 0, paddingBottom: 150 }, // No horizontal padding here
+  listContentContainer: { paddingHorizontal: 0, paddingBottom: 150 },
   itemContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 12,
-    paddingHorizontal: 16, // Padding is now inside the item container
-    backgroundColor: '#FFFFFF', // White background for the swipeable area
+    paddingHorizontal: 16,
+    backgroundColor: '#FFFFFF',
   },
   itemImage: { width: 60, height: 60, borderRadius: 8, backgroundColor: '#f0f0f0', marginRight: 12 },
   itemDetails: { flex: 1, marginRight: 10 },

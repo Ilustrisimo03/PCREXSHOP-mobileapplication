@@ -44,9 +44,7 @@ const CategoryProducts = ({ route, navigation }) => {
   useEffect(() => {
     let baseProducts = [];
     
-    if (categoryName.toLowerCase() === 'all') {
-      baseProducts = Item;
-    } else if (categoryName.toLowerCase() === 'pre built pc') {
+      if (categoryName.toLowerCase() === 'best seller') {
       baseProducts = Item.filter(p => parseFloat(p.rate) >= 4.5);
     } else {
       baseProducts = Item.filter(p => p.category && p.category.name.toLowerCase() === categoryName.toLowerCase());
@@ -87,7 +85,7 @@ const CategoryProducts = ({ route, navigation }) => {
         
         <View style={styles.header}>
             <TouchableOpacity onPress={() => navigation.goBack()}>
-                <Icon name="arrow-left" size={28} color={THEME.cardBackground} />
+                <Icon name="chevron-left" size={28} color={THEME.cardBackground} />
             </TouchableOpacity>
 
             <View style={styles.searchContainer}>

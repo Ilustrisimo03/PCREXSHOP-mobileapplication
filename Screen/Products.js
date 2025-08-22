@@ -52,12 +52,12 @@ const Products = ({ navigation }) => {
   const [allProducts] = useState(Item);
   const [filteredProducts, setFilteredProducts] = useState(Item);
   const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedCategory, setSelectedCategory] = useState();
   const { itemCount } = useCart();
 
   // Initial data loading for categories
   useEffect(() => {
-    const uniqueCategories = ['All', ...new Set(Item.map(item => item.category.name))];
+    const uniqueCategories = [, ...new Set(Item.map(item => item.category.name))];
     setCategories(uniqueCategories);
   }, []);
 
@@ -65,9 +65,7 @@ const Products = ({ navigation }) => {
   useEffect(() => {
     let result = allProducts;
 
-    if (selectedCategory !== 'All') {
-      result = result.filter(p => p.category.name.toLowerCase() === selectedCategory.toLowerCase());
-    }
+    
 
     if (searchQuery.trim() !== '') {
       result = result.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -88,7 +86,7 @@ const Products = ({ navigation }) => {
 
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Icon name="arrow-left" size={28} color={THEME.cardBackground} />
+          <Icon name="chevron-left" size={28} color={THEME.cardBackground} />
         </TouchableOpacity>
 
         <View style={styles.searchContainer}>
@@ -203,5 +201,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto-Medium', 
   },
 });
+
 
 export default Products;

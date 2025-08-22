@@ -12,15 +12,15 @@ import {
   FlatList,
   Platform,
   StatusBar,
-  Image // Import the Image component
+  Image,
+  Switch // Import Switch for the toggle
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import { useCart } from '../context/CartContext'; // <-- Import the useCart hook
+import { useCart } from '../context/CartContext';
 
-// --- IMPORTANT ---
 // Assumes Item.json is in a 'data' folder at the parent level
 import Item from '../data/Item.json';
 
@@ -38,6 +38,7 @@ const componentStructure = [
 
 // --- UTILITY & COMPATIBILITY LOGIC ---
 const getAttribute = (product, keywords) => {
+    if (!product) return null;
     const text = `${product.name} ${product.description}`.toLowerCase();
     for (const keyword of keywords) {
         if (text.includes(keyword.toLowerCase())) return keyword;
@@ -52,15 +53,18 @@ const getMoboFormFactor = (product) => getAttribute(product, ['Micro-ATX', 'Micr
 
 // --- REACT NATIVE COMPONENT ---
 const Builder = () => {
+    
     const navigation = useNavigation();
-     const { addBuildToCart } = useCart(); // <-- Get the addBuildToCart 
+    // --- (FIX 1) --- Inayos ang pangalan ng function para tumugma sa CartContext ---
+    const { addToCart } = useCart();
     const [allProducts, setAllProducts] = useState([]);
     const [selectedComponents, setSelectedComponents] = useState({});
     const [isLoading, setIsLoading] = useState(true);
     const [isModalVisible, setModalVisible] = useState(false);
     const [currentSlot, setCurrentSlot] = useState(null);
+    const [showOnlyCompatible, setShowOnlyCompatible] = useState(true); // State for the toggle
 
-    // --- FONT LOADING (Corrected) ---
+    // --- FONT LOADING ---
     const [fontsLoaded] = useFonts({
       'Roboto-Regular': require('../assets/fonts/Roboto/static/Roboto_Condensed-Regular.ttf'),
       'Roboto-Medium': require('../assets/fonts/Roboto/static/Roboto_Condensed-Medium.ttf'),
@@ -74,7 +78,42 @@ const Builder = () => {
         setIsLoading(false);
     }, []);
 
-    // --- COMPATIBILITY CHECK ---
+    // --- RECOMMENDATION ENGINE (for modal) ---
+    const getCompatibilityInfo = (product, productType, currentSelection) => {
+        const { cpu, motherboard } = currentSelection;
+
+        if (productType === 'Motherboard' && cpu) {
+            const cpuSocket = getCpuSocket(cpu);
+            const moboSocket = getCpuSocket(product);
+            if (cpuSocket && moboSocket && cpuSocket !== moboSocket) {
+                return { compatible: false, reason: `Socket Mismatch: Requires ${cpuSocket}` };
+            }
+        }
+
+        if (productType === 'Processor' && motherboard) {
+            const moboSocket = getCpuSocket(motherboard);
+            const cpuSocket = getCpuSocket(product);
+            if (moboSocket && cpuSocket && moboSocket !== cpuSocket) {
+                return { compatible: false, reason: `Socket Mismatch: Requires ${moboSocket}` };
+            }
+        }
+
+        if (productType === 'Memory (RAM)' && motherboard) {
+            const moboRamType = getRamType(motherboard);
+            const memRamType = getRamType(product);
+            if (moboRamType && memRamType && moboRamType !== memRamType) {
+                return { compatible: false, reason: `RAM Type Mismatch: Requires ${moboRamType}` };
+            }
+        }
+        
+        if (getRamFormFactor(product) === 'SODIMM') {
+            return { compatible: false, reason: 'SODIMM RAM is for laptops, not desktops.'};
+        }
+
+        return { compatible: true, reason: null };
+    };
+
+    // --- COMPATIBILITY CHECK (for summary) ---
     const compatibilityResult = useMemo(() => {
         const issues = [];
         const { cpu, motherboard, memory, pccase, cpu_cooler } = selectedComponents;
@@ -156,19 +195,27 @@ const Builder = () => {
         );
     };
 
+    // --- (FIX 2) --- Inayos ang function para isa-isang idagdag ang bawat item ---
     const handleAddToCart = () => {
         if (!compatibilityResult.compatible) {
-            Alert.alert( "Cannot Add to Cart", "Your build has compatibility issues or is incomplete. Please resolve them before proceeding.");
+            Alert.alert(
+                "Cannot Add to Cart",
+                "Your build has compatibility issues or is incomplete. Please resolve them before proceeding."
+            );
             return;
         }
 
-        // Use the context function to add the selected components to the global cart state
-        addBuildToCart(Object.values(selectedComponents));
+        const buildItems = Object.values(selectedComponents);
         
-        // Navigate to the Cart screen
+        buildItems.forEach(item => {
+            addToCart(item);
+        });
+        
         navigation.navigate('Cart');
-        
-        Alert.alert( "Build Added to Cart", `Your custom PC build with a total of ₱${totalPrice.toFixed(2)} has been added to your cart.`);
+        Alert.alert(
+            "Build Added to Cart",
+            `Your custom PC build with ${buildItems.length} items has been added to your cart.`
+        );
     };
 
     // --- RENDER FUNCTIONS ---
@@ -199,6 +246,56 @@ const Builder = () => {
             </View>
         );
     };
+    
+    const renderModalProductList = () => {
+        const availableProducts = allProducts.filter(p => p.type === currentSlot?.type);
+        if (availableProducts.length === 0) {
+            return <Text style={styles.noPartsText}>No parts available for this category.</Text>;
+        }
+
+        const filteredProducts = showOnlyCompatible
+            ? availableProducts.filter(p => getCompatibilityInfo(p, currentSlot?.type, selectedComponents).compatible)
+            : availableProducts;
+            
+        if (filteredProducts.length === 0) {
+            return <Text style={styles.noPartsText}>No compatible parts found for your current selection.</Text>;
+        }
+
+        return (
+            <FlatList
+                data={filteredProducts}
+                keyExtractor={item => item.id.toString()}
+                renderItem={({ item }) => {
+                    const { compatible, reason } = getCompatibilityInfo(item, currentSlot.type, selectedComponents);
+                    return (
+                        <TouchableOpacity 
+                            style={[styles.productItem, !compatible && styles.incompatibleItem]} 
+                            onPress={() => handleSelectComponent(item)}
+                            disabled={!compatible}
+                        >
+                            {item.images && item.images.length > 0 && (
+                                <Image source={{ uri: item.images[0] }} style={styles.productImageModal} />
+                            )}
+                            <View style={styles.productInfo}>
+                                <Text style={styles.productName}>{item.name}</Text>
+                                {!compatible && (
+                                    <Text style={styles.compatibilityWarningText}>
+                                        <Icon name="alert-circle" size={12} /> Incompatible: {reason}
+                                    </Text>
+                                )}
+                                <Text style={styles.productRating}>Rating: {item.rate}/5 ({item.review} reviews)</Text>
+                            </View>
+                            <View style={styles.productAction}>
+                                <Text style={styles.productPrice}>₱{parseFloat(item.price).toFixed(2)}</Text>
+                            </View>
+                        </TouchableOpacity>
+                    );
+                }}
+                ItemSeparatorComponent={() => <View style={styles.separator} />}
+            />
+        );
+    };
+
 
     if (!fontsLoaded || isLoading) {
         return ( <View style={styles.centered}><ActivityIndicator size="large" color="#E31C25" /></View> );
@@ -209,7 +306,7 @@ const Builder = () => {
             <StatusBar barStyle="dark-content" backgroundColor='#E31C25'/>
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Icon name="arrow-left" size={28} color="#FFFFFF" />
+                    <Icon name="chevron-left" size={28} color="#FFFFFF" />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>PC Part Builder</Text>
                 <View style={{ width: 28 }} />
@@ -288,29 +385,17 @@ const Builder = () => {
                             <Icon name="close" size={24} color="#64748b" />
                         </TouchableOpacity>
                     </View>
-                    <FlatList
-                        data={allProducts.filter(p => p.type === currentSlot?.type)}
-                        keyExtractor={item => item.id.toString()}
-                        renderItem={({ item }) => (
-                            <TouchableOpacity style={styles.productItem} onPress={() => handleSelectComponent(item)}>
-                                {item.images && item.images.length > 0 && (
-                                    <Image source={{ uri: item.images[0] }} style={styles.productImageModal} />
-                                )}
-                                <View style={styles.productInfo}>
-                                    <Text style={styles.productName}>{item.name}</Text>
-                                    <Text style={styles.productDesc} numberOfLines={2}>{item.description}</Text>
-                                    <Text style={styles.productRating}>Rating: {item.rate}/5 ({item.review} reviews)</Text>
-                                </View>
-                                <View style={styles.productAction}>
-                                    <Text style={styles.productPrice}>₱{parseFloat(item.price).toFixed(2)}</Text>
-                                    <View style={styles.selectButton}>
-                                        <Text style={styles.selectButtonText}>Select</Text>
-                                    </View>
-                                </View>
-                            </TouchableOpacity>
-                        )}
-                        ItemSeparatorComponent={() => <View style={styles.separator} />}
-                    />
+                    <View style={styles.toggleContainer}>
+                        <Text style={styles.toggleLabel}>Show only compatible parts</Text>
+                        <Switch
+                            trackColor={{ false: "#767577", true: "#fca5a5" }}
+                            thumbColor={showOnlyCompatible ? "#E31C25" : "#f4f3f4"}
+                            ios_backgroundColor="#3e3e3e"
+                            onValueChange={() => setShowOnlyCompatible(previousState => !previousState)}
+                            value={showOnlyCompatible}
+                        />
+                    </View>
+                    {renderModalProductList()}
                 </SafeAreaView>
             </Modal>
         </SafeAreaView>
@@ -357,8 +442,11 @@ const styles = StyleSheet.create({
     modalContainer: { flex: 1, backgroundColor: '#FFFFFF' },
     modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: '#e2e8f0' },
     modalTitle: { fontSize: 20, fontFamily: 'Roboto-Medium', color: '#1C1C1C' },
-    separator: { height: 1, backgroundColor: '#e2e8f0', marginHorizontal: 16 },
-    productItem: { flexDirection: 'row', alignItems: 'center', padding: 16 },
+    toggleContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#e2e8f0' },
+    toggleLabel: { fontSize: 16, fontFamily: 'Roboto-Regular', color: '#334155' },
+    separator: { height: 1, backgroundColor: '#e2e8f0' },
+    productItem: { flexDirection: 'row', alignItems: 'center', padding: 16, backgroundColor: '#FFF' },
+    incompatibleItem: { backgroundColor: '#fff7ed' },
     productImageModal: { width: 70, height: 70, borderRadius: 8, backgroundColor: '#e2e8f0', marginRight: 16 },
     productInfo: { flex: 1, marginRight: 8 },
     productName: { fontSize: 16, fontFamily: 'Roboto-Medium', color: '#1e293b' },
@@ -366,8 +454,8 @@ const styles = StyleSheet.create({
     productRating: { fontSize: 12, color: '#94a3b8', marginTop: 8 },
     productAction: { alignItems: 'flex-end', marginLeft: 12 },
     productPrice: { fontSize: 18, fontFamily: 'Roboto-Medium', color: '#E31C25', marginBottom: 8 },
-    selectButton: { backgroundColor: '#E31C25', paddingVertical: 8, paddingHorizontal: 16, borderRadius: 8 },
-    selectButtonText: { color: 'white', fontFamily: 'Roboto-Medium' },
+    compatibilityWarningText: { color: '#f97316', fontFamily: 'Roboto-Medium', fontSize: 12, marginTop: 4 },
+    noPartsText: { textAlign: 'center', marginTop: 40, fontSize: 16, color: '#64748b', fontFamily: 'Roboto-Regular' },
 });
 
 export default Builder;

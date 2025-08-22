@@ -55,7 +55,7 @@ const HomeScreen = ({ navigation }) => {
 
   // Initial data loading
   useEffect(() => {
-    const uniqueCategories = ['All', ...new Set(Item.map(item => item.category.name))];
+    const uniqueCategories = [...new Set(Item.map(item => item.category.name))];
     setCategories(uniqueCategories);
     
     setBestSellerProducts(Item.filter(p => parseFloat(p.rate) >= 4.5).slice(0, 8));
@@ -117,7 +117,7 @@ const HomeScreen = ({ navigation }) => {
         </TouchableOpacity>
 
         {/* Account */}
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('')}>
           <Icon name="account-outline" size={28} color={THEME.icons} style={styles.headerIcon} />
         </TouchableOpacity>
       </View>
@@ -127,7 +127,7 @@ const HomeScreen = ({ navigation }) => {
         <BannerSlider />
         <CategoryList categories={categories} navigation={navigation} />
 
-        <ProductSection title="Pre Built PC" data={bestSellerProducts} navigation={navigation} theme={THEME} />
+        <ProductSection title="Best Seller" data={bestSellerProducts} navigation={navigation} theme={THEME} />
         <ProductSection title="Pre-built" data={preBuiltProducts} navigation={navigation} theme={THEME} />
         
         <View style={styles.sectionContainer}>

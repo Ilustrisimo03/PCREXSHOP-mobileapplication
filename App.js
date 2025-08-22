@@ -3,7 +3,8 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 // import { CartProvider } from './context/CartContext';
 import { StatusBar } from 'react-native';
-import { CartProvider } from './context/CartContext'; // <-- Import 
+import { CartProvider } from './context/CartContext'; // <-- Import CartProvider
+import { OrderProvider } from './context/OrderContext'; // <-- I-import ang OrderProvider
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import 'react-native-gesture-handler';
@@ -13,16 +14,20 @@ import HomeScreen from "./Screen/HomeScreen";
 import Cart from "./Screen/Cart";
 import CategoryProducts from "./Screen/CategoryProducts";
 import ProductDetails from "./Screen/ProducDetails";
+import Checkout from "./Screen/Checkout";
+import OrderSuccess from "./Screen/OrderSuccess";
 import Products from "./Screen/Products";
 import Builder from "./Screen/Builder";
 import Account from "./Screen/Account";
 import SignIn_SignUp from "./Screen/SignIn_SignUp";
 import LoadingScreen from "./Screen/LoadingScreen";
 
-// import Topay from "./Screen/Topay";
-// import Toship from "./Screen/Toship";
-// import Toreceive from "./Screen/Toreceive";
-// import Toreview from "./Screen/Toreview";
+
+import ViewOrder from "./Screen/orders/ViewOrder";
+import ToPay from "./Screen/orders/ToPay";
+import ToShip from "./Screen/orders/ToShip";
+import ToReceive from "./Screen/orders/ToReceive";
+import ToReview from "./Screen/orders/ToReview";
 // import Editprofile from "./Screen/Editprofile";
 // import Shippingaddress from "./Screen/Shippingaddress";
 
@@ -127,23 +132,31 @@ const TabNavigator = () => {
 const App = () => {
   return (
     
-     
-    <NavigationContainer>
-        <CartProvider>
-    <StatusBar 
-  backgroundColor="transparent" 
-  barStyle="dark-content" 
-/>
+    <CartProvider>
+      <OrderProvider>
+        <NavigationContainer>
+        
+            <StatusBar 
+          backgroundColor="transparent" 
+          barStyle="light-content" 
+        />
       <Stack.Navigator initialRouteName="LoadingScreen">
-        {/* Mga screen bago ang authentication */}
         <Stack.Screen name="LoadingScreen" component={LoadingScreen} options={{ headerShown: false }} />
-         <Stack.Screen name="Cart" component={Cart} options={{ headerShown: false }} />
-         <Stack.Screen name="CategoryProducts" component={CategoryProducts} options={{ headerShown: false }} />
-         <Stack.Screen name="ProductDetails" component={ProductDetails} options={{ headerShown: false }} />
+        <Stack.Screen name="Cart" component={Cart} options={{ headerShown: false }} />
+        <Stack.Screen name="CategoryProducts" component={CategoryProducts} options={{ headerShown: false }} />
+        <Stack.Screen name="Checkout" component={Checkout} options={{ headerShown: false }} />
+        <Stack.Screen name="OrderSuccess" component={OrderSuccess} options={{ headerShown: false }} />
+        <Stack.Screen name="ProductDetails" component={ProductDetails} options={{ headerShown: false }} />
         <Stack.Screen name="SignIn_SignUp" component={SignIn_SignUp} options={{ headerShown: false }} />
         <Stack.Screen name="Account" component={Account} options={{ headerShown: false }} />
         <Stack.Screen name="Products" component={Products} options={{ headerShown: false }} />
         <Stack.Screen name="Builder" component={Builder} options={{ headerShown: false }} />
+
+        <Stack.Screen name="ViewOrder" component={ViewOrder} options={{ headerShown: false }} />
+        <Stack.Screen name="ToPay" component={ToPay} options={{ headerShown: false }} />
+        <Stack.Screen name="ToShip" component={ToShip} options={{ headerShown: false }} />
+        <Stack.Screen name="ToReceive" component={ToReceive} options={{ headerShown: false }} />
+        <Stack.Screen name="ToReview" component={ToReview} options={{ headerShown: false }} />
         {/* Main Application Screens pagkatapos mag-login (nakapaloob sa Tab Navigator) */}
         <Stack.Screen
           name="HomeScreen"
@@ -151,8 +164,11 @@ const App = () => {
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
-      </CartProvider>
+        
     </NavigationContainer>
+
+     </OrderProvider>
+    </CartProvider>
     
   );
 };

@@ -47,8 +47,8 @@ const ProductDetails = ({ route, navigation }) => {
   };
 
   const handleBuyNow = () => {
-    buyNow(product);
-    navigation.navigate('Cart');
+    buyNow(product); 
+    navigation.navigate('Checkout'); 
   };
 
   const onViewableItemsChanged = useCallback(({ viewableItems }) => {
@@ -67,7 +67,7 @@ const ProductDetails = ({ route, navigation }) => {
       
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Icon name="arrow-left" size={28} color={THEME.text} />
+          <Icon name="chevron-left" size={28} color={THEME.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Details</Text>
         
@@ -140,10 +140,7 @@ const ProductDetails = ({ route, navigation }) => {
             <Icon name="cart-plus" size={22} color={THEME.background} />
             <Text style={styles.addToCartButtonText}>Add to Cart</Text>
           </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.buyNowButton} 
-            onPress={handleBuyNow}
-          >
+          <TouchableOpacity style={styles.buyNowButton} onPress={handleBuyNow}>
             <Icon name="credit-card-outline" size={22} color={THEME.background} />
             <Text style={styles.buyNowButtonText}>Buy Now</Text>
           </TouchableOpacity>

@@ -1,7 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { useFonts } from 'expo-font'; // Import the useFonts hook
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // Import the Icon component
 import ProductCard from './ProductCard';
+
 
 // Binago: Tumatanggap na ng 'theme' prop
 const ProductSection = ({ title, data, navigation, theme }) => {
@@ -26,7 +28,7 @@ const ProductSection = ({ title, data, navigation, theme }) => {
   if (!data || data.length === 0) return null;
 
   const handleMorePress = () => {
-    const categoryNameToPass = title.toLowerCase() === 'pre-built' ? 'pre-built' : title;
+    const categoryNameToPass = title.toLowerCase() === 'best seller' ? 'best seller' : title;
     navigation.navigate('CategoryProducts', { categoryName: categoryNameToPass });
   };
 
@@ -35,16 +37,19 @@ const ProductSection = ({ title, data, navigation, theme }) => {
     sectionContainer: { marginBottom: 8 },
     sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, marginBottom: 12 },
     sectionTitle: { fontSize: 18, fontFamily: 'Roboto-Medium', color: theme.text }, // Gumagamit ng theme.text
-    moreText: { fontSize: 13, fontFamily: 'Roboto-SemiBold', color: '#888' },
+    moreButton: {flexDirection: 'row',   alignItems: 'center',  },
+    moreText: { fontSize: 13, fontFamily: 'Roboto-SemiBold', color: '#888',},
   });
 
   return (
     <View style={styles.sectionContainer}>
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>{title}</Text>
-        <TouchableOpacity onPress={handleMorePress}>
-          <Text style={styles.moreText}>more</Text>
+        <TouchableOpacity style={styles.moreButton} onPress={handleMorePress}>
+          <Text style={styles.moreText}>More</Text>
+          <Icon name="chevron-right" size={20} color="#E31C25" />
         </TouchableOpacity>
+
       </View>
       <FlatList
         data={data}
@@ -61,5 +66,6 @@ const ProductSection = ({ title, data, navigation, theme }) => {
     </View>
   );
 };
+
 
 export default React.memo(ProductSection);
