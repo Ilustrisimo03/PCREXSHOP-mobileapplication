@@ -1,45 +1,32 @@
+// ProductSection.js (General Horizontal Product List)
 import React from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
-import { useFonts } from 'expo-font'; // Import the useFonts hook
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // Import the Icon component
+import { useFonts } from 'expo-font';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ProductCard from './ProductCard';
 
+const THEME = {
+  primary: '#E31C25',
+  text: '#1C1C1C',
+};
 
-// Binago: Tumatanggap na ng 'theme' prop
-const ProductSection = ({ title, data, navigation, theme }) => {
+const ProductSection = ({ title, data, navigation }) => {
+  const [fontsLoaded] = useFonts({
+    'Rubik-Regular': require('../assets/fonts/Rubik/static/Rubik-Regular.ttf'),
+    'Rubik-Bold': require('../assets/fonts/Rubik/static/Rubik-Bold.ttf'),
+    'Rubik-Medium': require('../assets/fonts/Rubik/static/Rubik-Medium.ttf'),
+    'Rubik-SemiBold': require('../assets/fonts/Rubik/static/Rubik-SemiBold.ttf'),
+  });
 
-  // Load custom fonts
-          const [fontsLoaded] = useFonts({
-            'Roboto-Regular': require('../assets/fonts/Roboto/static/Roboto_Condensed-Regular.ttf'),
-            'Roboto-Bold': require('../assets/fonts/Roboto/static/Roboto_Condensed-Bold.ttf'),
-            'Roboto-Medium': require('../assets/fonts/Roboto/static/Roboto_Condensed-Medium.ttf'),
-            'Roboto-SemiBold': require('../assets/fonts/Roboto/static/Roboto_Condensed-SemiBold.ttf'), // Make sure this font file exists
-          });
-    
-    
-          
-        // Wait until the fonts are loaded before rendering the screen
-      if (!fontsLoaded) {
-        return null; // Or you can return a loading indicator here
-      }
-
-
+  if (!fontsLoaded) {
+    return null;
+  }
 
   if (!data || data.length === 0) return null;
 
   const handleMorePress = () => {
-    const categoryNameToPass = title.toLowerCase() === 'best seller' ? 'best seller' : title;
-    navigation.navigate('CategoryProducts', { categoryName: categoryNameToPass });
+    navigation.navigate('CategoryProducts', { categoryName: title });
   };
-
-  // Gumamit ng 'theme' prop para sa kulay
-  const styles = StyleSheet.create({
-    sectionContainer: { marginBottom: 8 },
-    sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, marginBottom: 12 },
-    sectionTitle: { fontSize: 18, fontFamily: 'Roboto-Medium', color: theme.text }, // Gumagamit ng theme.text
-    moreButton: {flexDirection: 'row',   alignItems: 'center',  },
-    moreText: { fontSize: 13, fontFamily: 'Roboto-SemiBold', color: '#888',},
-  });
 
   return (
     <View style={styles.sectionContainer}>
@@ -47,9 +34,8 @@ const ProductSection = ({ title, data, navigation, theme }) => {
         <Text style={styles.sectionTitle}>{title}</Text>
         <TouchableOpacity style={styles.moreButton} onPress={handleMorePress}>
           <Text style={styles.moreText}>More</Text>
-          <Icon name="chevron-right" size={20} color="#E31C25" />
+          <Icon name="chevron-right" size={20} color={THEME.primary} />
         </TouchableOpacity>
-
       </View>
       <FlatList
         data={data}
@@ -67,5 +53,12 @@ const ProductSection = ({ title, data, navigation, theme }) => {
   );
 };
 
+const styles = StyleSheet.create({
+  sectionContainer: { marginBottom: 8 },
+  sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, marginBottom: 12 },
+  sectionTitle: { fontSize: 18, fontFamily: 'Rubik-Medium', color: THEME.text },
+  moreButton: { flexDirection: 'row', alignItems: 'center' },
+  moreText: { fontSize: 13, fontFamily: 'Rubik-SemiBold', color: '#888' }, // Consistent with BestSeller/PreBuilt
+});
 
-export default React.memo(ProductSection);
+export default ProductSection;

@@ -14,10 +14,10 @@ const categoryIcons = {
 const CategoryList = ({ categories, navigation }) => {
    // Load custom fonts
       const [fontsLoaded] = useFonts({
-        'Roboto-Regular': require('../assets/fonts/Roboto/static/Roboto_Condensed-Regular.ttf'),
-        'Roboto-Bold': require('../assets/fonts/Roboto/static/Roboto_Condensed-Bold.ttf'),
-        'Roboto-Medium': require('../assets/fonts/Roboto/static/Roboto_Condensed-Medium.ttf'),
-        'Roboto-SemiBold': require('../assets/fonts/Roboto/static/Roboto_Condensed-SemiBold.ttf'), // Make sure this font file exists
+        'Rubik-Regular': require('../assets/fonts/Rubik/static/Rubik-Regular.ttf'),
+        'Rubik-Bold': require('../assets/fonts/Rubik/static/Rubik-Bold.ttf'),
+        'Rubik-Medium': require('../assets/fonts/Rubik/static/Rubik-Medium.ttf'),
+        'Rubik-SemiBold': require('../assets/fonts/Rubik/static/Rubik-SemiBold.ttf'), // Make sure this font file exists
       });
 
     // Wait until the fonts are loaded before rendering the screen
@@ -26,6 +26,7 @@ const CategoryList = ({ categories, navigation }) => {
   }
   return (
     <View style={styles.categorySectionContainer}>
+      <Text style={styles.CategoriesText}>Categories</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoryScroll}>
         {categories.map((cat, index) => (
           <TouchableOpacity
@@ -37,7 +38,7 @@ const CategoryList = ({ categories, navigation }) => {
             <View style={styles.buttonContent}>
               
               
-              <Icon name={categoryIcons[cat] || 'help-circle'} size={20} color="#E31C25" />
+              <Icon name={categoryIcons[cat] || 'help-circle'} size={20} color="#FFFFFF" />
 
              
               <Text style={styles.categoryText}>{cat}</Text>
@@ -51,26 +52,27 @@ const CategoryList = ({ categories, navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  categorySectionContainer: { marginVertical: 19 },
+  categorySectionContainer: { marginVertical: 16 },
+  CategoriesText:{ fontSize: 18, fontFamily: 'Rubik-Medium', paddingHorizontal: 16, marginBottom: 12},
   categoryScroll: { paddingHorizontal: 16 },
   categoryButton: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 10,
+    backgroundColor: '#E31C25',
+    borderRadius: 15,
     marginRight: 10,
     paddingHorizontal: 15,
     height: 50, // Pwedeng i-adjust ang height kung kailangan
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#E31C25',
+    borderColor: '#FFFFFF',
   },
   buttonContent: {
     flexDirection: 'row', // Dinagdag para maging horizontal ang alignment
     alignItems: 'center'
   },
   categoryText: {
-    color: '#E31C25',
-    fontFamily: 'Roboto-SemiBold',
+    color: '#FFFFFF',
+    fontFamily: 'Rubik-SemiBold',
     fontSize: 14,
     marginLeft: 5
   },

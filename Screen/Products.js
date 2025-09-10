@@ -10,18 +10,15 @@ import {
   StatusBar, 
   Platform
 } from 'react-native';
-import { useFonts } from 'expo-font'; // Import the useFonts hook
-import { useCart } from '../context/CartContext'; // Already imported, great!
+import { useFonts } from 'expo-font';
+import { useCart } from '../context/CartContext';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-// Import data
 import Item from '../data/Item.json';
 
-// Import components
 import CategoryList from '../Components/CategoryList';
 import ProductCard from '../Components/ProductCard';
 
-// THEME constant
 const THEME = {
   primary: '#E31C25',
   background: '#FFFFFF',
@@ -31,48 +28,42 @@ const THEME = {
 };
 
 const Products = ({ navigation }) => {
-
-  // Load custom fonts
-            const [fontsLoaded] = useFonts({
-              'Roboto-Regular': require('../assets/fonts/Roboto/static/Roboto_Condensed-Regular.ttf'),
-              'Roboto-Bold': require('../assets/fonts/Roboto/static/Roboto_Condensed-Bold.ttf'),
-              'Roboto-Medium': require('../assets/fonts/Roboto/static/Roboto_Condensed-Medium.ttf'),
-              'Roboto-SemiBold': require('../assets/fonts/Roboto/static/Roboto_Condensed-SemiBold.ttf'), // Make sure this font file exists
-            });
+  const [fontsLoaded] = useFonts({
+    'Rubik-Regular': require('../assets/fonts/Rubik/static/Rubik-Regular.ttf'),
+    'Rubik-Bold': require('../assets/fonts/Rubik/static/Rubik-Bold.ttf'),
+    'Rubik-Medium': require('../assets/fonts/Rubik/static/Rubik-Medium.ttf'),
+    'Rubik-SemiBold': require('../assets/fonts/Rubik/static/Rubik-SemiBold.ttf'),
+  });
       
-      
-            
-          // Wait until the fonts are loaded before rendering the screen
-        if (!fontsLoaded) {
-          return null; // Or you can return a loading indicator here
-        }
-  
-
   const [searchQuery, setSearchQuery] = useState('');
-  const [allProducts] = useState(Item);
-  const [filteredProducts, setFilteredProducts] = useState(Item);
-  const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState();
+  const [allProducts] = useState(Item.map(item => ({
+    ...item,
+    category: item.category || { name: 'Unknown' } // Ensure category object exists
+  }))); // Process items once
+  const [filteredProducts, setFilteredProducts] = useState(allProducts);
+  const [categories, setCategories] = useState([]); // State to hold unique categories
   const { itemCount } = useCart();
 
-  // Initial data loading for categories
   useEffect(() => {
-    const uniqueCategories = [, ...new Set(Item.map(item => item.category.name))];
+    // Derive unique categories from allProducts (removed 'All Products')
+    const uniqueCategories = [...new Set(allProducts.map(item => item.category.name))];
     setCategories(uniqueCategories);
-  }, []);
+  }, [allProducts]); // Re-run if allProducts changes (though it's useState once)
 
-  // Effect to filter products based on search and category
+
   useEffect(() => {
     let result = allProducts;
-
-    
 
     if (searchQuery.trim() !== '') {
       result = result.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
     }
 
     setFilteredProducts(result);
-  }, [searchQuery, selectedCategory, allProducts]);
+  }, [searchQuery, allProducts]);
+
+  if (!fontsLoaded) {
+    return null;
+  }
 
   const renderProduct = ({ item }) => (
     <View style={styles.gridCardContainer}>
@@ -100,24 +91,24 @@ const Products = ({ navigation }) => {
           />
         </View>
 
-        {/* --- UPDATED CART ICON WITH BADGE --- */}
         <TouchableOpacity onPress={() => navigation.navigate('Cart')}>
-                          <View>
-                            <Icon name="cart-outline" size={28} color={THEME.icons} />
-                            {itemCount > 0 && (
-                              <View style={styles.badgeContainer}>
-                                <Text style={styles.badgeText}>{itemCount}</Text>
-                              </View>
-                            )}
-                          </View>
+            <View>
+                <Icon name="cart-outline" size={28} color={THEME.icons} />
+                {itemCount > 0 && (
+                  <View style={styles.badgeContainer}>
+                    <Text style={styles.badgeText}>{itemCount}</Text>
+                  </View>
+                )}
+            </View>
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('Account')}>
           <Icon name="account-outline" size={28} color={THEME.cardBackground} style={styles.headerIcon} />
         </TouchableOpacity>
+        
       </View>
 
      <CategoryList categories={categories} navigation={navigation} />
-
+      
       <FlatList
         data={filteredProducts}
         renderItem={renderProduct}
@@ -130,6 +121,7 @@ const Products = ({ navigation }) => {
           </View>
         }
       />
+      
     </SafeAreaView>
   );
 };
@@ -139,13 +131,12 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingBottom: Platform.OS === 'ios' ? 80 : 60,
     backgroundColor: THEME.background
-
   },
   header: {
     backgroundColor: THEME.primary,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 12,
+    paddingHorizontal: 16, 
     paddingVertical: 10,
     gap: 8
   },
@@ -154,20 +145,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: THEME.cardBackground,
-    borderRadius: 8,
+    borderRadius: 15,
     height: 40
   },
   searchInput: {
     flex: 1,
     paddingHorizontal: 10,
     fontSize: 14,
-    fontFamily: 'Roboto-Regular', 
     color: THEME.text
   },
   headerIcon: {
     marginLeft: 4
   },
-  // --- ADDED STYLES FOR THE BADGE ---
   badgeContainer: {
     position: 'absolute',
     top: -4,
@@ -184,7 +173,7 @@ const styles = StyleSheet.create({
   badgeText: {
     color: THEME.primary,
     fontSize: 12,
-    fontFamily: 'Roboto-Bold',
+    fontFamily: 'Rubik-Bold',
   },
   gridCardContainer: {
     width: '50%',
@@ -198,9 +187,8 @@ const styles = StyleSheet.create({
   noResultsText: {
     fontSize: 16,
     color: '#6c757d',
-    fontFamily: 'Roboto-Medium', 
+    fontFamily: 'Rubik-Medium', 
   },
 });
-
 
 export default Products;

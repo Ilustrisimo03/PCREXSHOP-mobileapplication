@@ -1,7 +1,6 @@
 // context/CartContext.js
 
 import React, { createContext, useState, useContext, useMemo } from 'react';
-import { Alert } from 'react-native';
 
 // 1. Create the Context
 const CartContext = createContext();
@@ -11,38 +10,67 @@ export const CartProvider = ({ children }) => {
     const [cartItems, setCartItems] = useState([]);
 
     /**
-     * Adds a single product to the cart.
-     * Checks if the item already exists before adding.
+     * Adds a product to the cart or increments its quantity if it already exists.
+     * Respects the item's stock limit.
      * @param {Object} product - The product object to add.
      */
     const addToCart = (product) => {
-        // Check if the item is already in the cart
-        const isItemInCart = cartItems.find(item => item.id === product.id);
+        setCartItems(prevItems => {
+            const existingItem = prevItems.find(item => item.id === product.id);
 
-        if (isItemInCart) {
-            Alert.alert("Already in Cart", `${product.name} is already in your cart.`);
-        } else {
-            setCartItems(prevItems => [...prevItems, product]);
-            Alert.alert("Item Added", `${product.name} has been added to your cart.`);
-        }
+            // If item is already in the cart
+            if (existingItem) {
+                // Check against stock before increasing quantity
+                if (existingItem.quantity < product.stock) {
+                    return prevItems.map(item =>
+                        item.id === product.id
+                            ? { ...item, quantity: item.quantity + 1 }
+                            : item
+                    );
+                } else {
+                    // Optionally, provide feedback that stock limit is reached.
+                    // This is handled in the UI for better user experience.
+                    return prevItems; // Do not add if stock limit is met
+                }
+            }
+            // If item is new, add it with quantity 1
+            else {
+                return [...prevItems, { ...product, quantity: 1 }];
+            }
+        });
+    };
+    
+    /**
+     * Increases the quantity of a specific item in the cart by one.
+     * @param {String|Number} itemId - The ID of the item to increase.
+     */
+    const increaseQuantity = (itemId) => {
+        setCartItems(prevItems =>
+            prevItems.map(item => {
+                if (item.id === itemId && item.quantity < item.stock) {
+                    return { ...item, quantity: item.quantity + 1 };
+                }
+                // Optionally, alert the user if they hit the stock limit.
+                return item;
+            })
+        );
     };
 
     /**
-     * Replaces the current cart with a new set of items from the PC Builder.
-     * @param {Array} items - An array of product objects to set as the new cart.
+     * Decreases the quantity of a specific item in the cart by one.
+     * If quantity becomes 0, it should be removed (handled by the remove button in UI).
+     * @param {String|Number} itemId - The ID of the item to decrease.
      */
-    const addBuildToCart = (items) => {
-        setCartItems(items.filter(item => item)); // Ensure no null/undefined items
+    const decreaseQuantity = (itemId) => {
+        setCartItems(prevItems =>
+            prevItems.map(item =>
+                item.id === itemId && item.quantity > 1
+                    ? { ...item, quantity: item.quantity - 1 }
+                    : item
+            )
+        );
     };
 
-    /**
-     * Sets the cart to a single item for immediate purchase and navigates to the cart.
-     * @param {Object} product - The product object to buy now.
-     */
-    const buyNow = (product) => {
-        setCartItems([product]); // Set the cart to only contain this one item
-        // Note: Navigation should be handled in the component after calling this.
-    };
 
     /**
      * Removes a specific item from the cart by its ID.
@@ -53,27 +81,31 @@ export const CartProvider = ({ children }) => {
     };
 
     /**
-     * Clears all items from the cart instantly without confirmation.
+     * Clears all items from the cart.
      */
     const clearCart = () => {
         setCartItems([]);
     };
 
-    // Calculate the total price whenever the cartItems array changes.
+    // Calculate total price based on price * quantity
     const totalPrice = useMemo(() => {
-        return cartItems.reduce((total, product) => total + parseFloat(product.price), 0);
+        return cartItems.reduce((total, item) => total + (parseFloat(item.price) * item.quantity), 0);
     }, [cartItems]);
 
-    // The value object contains all the state and functions for components to use.
+    // Calculate total number of items (units) in the cart
+    const itemCount = useMemo(() => {
+        return cartItems.reduce((total, item) => total + item.quantity, 0);
+    }, [cartItems]);
+
     const value = {
         cartItems,
         addToCart,
-        addBuildToCart,
-        buyNow,
         removeFromCart,
         clearCart,
+        increaseQuantity,
+        decreaseQuantity,
         totalPrice,
-        itemCount: cartItems.length
+        itemCount,
     };
 
     return (
@@ -83,7 +115,7 @@ export const CartProvider = ({ children }) => {
     );
 };
 
-// 3. Create a Custom Hook for easy context access
+// 3. Create a Custom Hook
 export const useCart = () => {
     return useContext(CartContext);
 };

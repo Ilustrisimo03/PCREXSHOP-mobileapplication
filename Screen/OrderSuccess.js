@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: { // Kinuha mula sa Checkout screen
     fontSize: 20,
-    fontFamily: 'Roboto-Medium',
+    fontFamily: 'Rubik-Medium',
     color: THEME.text
   },
   content: {
@@ -92,13 +92,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontFamily: 'Roboto-Bold',
+    fontFamily: 'Rubik-Bold',
     color: THEME.text,
     marginBottom: 12,
   },
   subtitle: {
     fontSize: 16,
-    fontFamily: 'Roboto-Regular',
+    fontFamily: 'Rubik-Regular',
     color: '#666',
     textAlign: 'center',
     marginBottom: 40,
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: THEME.background,
     fontSize: 16,
-    fontFamily: 'Roboto-SemiBold',
+    fontFamily: 'Rubik-SemiBold',
   },
 });
 

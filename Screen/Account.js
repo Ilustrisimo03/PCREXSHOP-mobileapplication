@@ -1,215 +1,285 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { 
+    View, 
+    Text, 
+    StyleSheet, 
+    TouchableOpacity, 
+    ScrollView,
+    Modal,
+    Pressable,
+    StatusBar 
+} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useFonts } from 'expo-font'; // Import the useFonts hook
+import { useFonts } from 'expo-font';
+import { useOrders } from '../context/OrderContext';
 
-import { useOrders } from '../context/OrderContext'; // Import useOrders
-import { useMemo } from 'react';
-
-
-// The component now accepts the 'navigation' prop
 const Account = ({ navigation }) => {
-
-   // Load custom fonts
-            const [fontsLoaded] = useFonts({
-              'Roboto-Regular': require('../assets/fonts/Roboto/static/Roboto_Condensed-Regular.ttf'),
-              'Roboto-Bold': require('../assets/fonts/Roboto/static/Roboto_Condensed-Bold.ttf'),
-              'Roboto-Medium': require('../assets/fonts/Roboto/static/Roboto_Condensed-Medium.ttf'),
-              'Roboto-SemiBold': require('../assets/fonts/Roboto/static/Roboto_Condensed-SemiBold.ttf'), // Make sure this font file exists
-            });
+    const [fontsLoaded] = useFonts({
+      'Rubik-Regular': require('../assets/fonts/Rubik/static/Rubik-Regular.ttf'),
+      'Rubik-Bold': require('../assets/fonts/Rubik/static/Rubik-Bold.ttf'),
+      'Rubik-Medium': require('../assets/fonts/Rubik/static/Rubik-Medium.ttf'),
+      'Rubik-SemiBold': require('../assets/fonts/Rubik/static/Rubik-SemiBold.ttf'),
+    });
   
-
     const { orders } = useOrders();
+    
+    const [isConfirmModalVisible, setConfirmModalVisible] = useState(false);
+    const [isLogoutSuccessVisible, setLogoutSuccessVisible] = useState(false);
 
-    // Gumamit ng useMemo para bilangin lang kapag nagbago ang orders
     const getOrderCountByStatus = (status) => {
         return useMemo(() => orders.filter(order => order.status === status).length, [orders]);
     };
 
-const toPayCount = getOrderCountByStatus('To Pay');
+    const toPayCount = getOrderCountByStatus('To Pay');
     const toShipCount = getOrderCountByStatus('To Ship');
     const toReceiveCount = getOrderCountByStatus('To Receive');
     const toReviewCount = getOrderCountByStatus('To Review');
 
-    // ... (navigation handlers)
     const handleTopay = () => navigation.navigate('ToPay');
     const handleToship = () => navigation.navigate('ToShip');
     const handleToreceive = () => navigation.navigate('ToReceive');
     const handleToreview = () => navigation.navigate('ToReview');
     const handleEditprofile = () => navigation.navigate('EditProfile');
     const handleShippingaddress = () => navigation.navigate('ShippingAddress');
-
-    // Bagong function para sa pag-navigate sa ViewOrder screen
-    const handleViewPurchaseHistory = () => {
-        navigation.navigate('ViewOrder');
-    };
+    const handleViewPurchaseHistory = () => navigation.navigate('ViewOrder');
 
     const handleLogout = () => {
-        navigation.replace('HomeScreen');
+        setConfirmModalVisible(true);
+    };
+
+    const confirmLogout = () => {
+        setConfirmModalVisible(false);
+        setLogoutSuccessVisible(true);
+
+        setTimeout(() => {
+            setLogoutSuccessVisible(false);
+            navigation.navigate('SignIn_SignUp');
+        }, 1500);
     };
 
     if (!fontsLoaded) {
         return null; 
     }
 
-
-  return (
+    return (
+   
     <ScrollView style={styles.container}>
-            {/* ... (profileSection) ... */}
-             <View style={styles.profileSection}>
-                <View style={styles.avatar}>
-                {/* You can replace this with an <Image> component */}
-                </View>
-                <Text style={styles.username}>Username</Text>
-            </View>
+         <StatusBar barStyle="dark-content" backgroundColor='#E31C25'/>
+        {/* Profile and Order Sections (No Changes Here) */}
+         <View style={styles.header}>
+            <TouchableOpacity onPress={() => navigation.goBack()}><Icon name="chevron-left" size={28} color="#FFFFFF" /></TouchableOpacity>
+                <Text style={styles.headerTitle}>My Account</Text>
+                <View style={{ width: 28 }} />
+        </View>
 
-            <View style={styles.ordersSection}>
-                {/* --- ITO ANG BAGONG SECTION HEADER --- */}
-                <View style={styles.sectionHeader}>
-                    <Text style={styles.sectionTitle}>My Orders</Text>
-                    <TouchableOpacity style={styles.ViewButton} onPress={handleViewPurchaseHistory}>
-                        <Text style={styles.viewHistoryText}>View Purchase History </Text>
-                        <Icon name="chevron-right" size={20} color="#E31C25" />
-                    </TouchableOpacity>
-                </View>
-                {/* ------------------------------------ */}
+        <View style={styles.profileSection}>
+            <View style={styles.avatar} />
+            <Text style={styles.username}>Username</Text>
+        </View>
 
-                <View style={styles.orderStatusContainer}>
-                    <TouchableOpacity style={styles.orderStatusItem} onPress={handleTopay}>
-                        {toPayCount > 0 && <View style={styles.badge}><Text style={styles.badgeText}>{toPayCount}</Text></View>}
-                        <Icon name="wallet-outline" size={30} color="#E31C25" />
-                        <Text style={styles.orderStatusText}>To Pay</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.orderStatusItem} onPress={handleToship}>
-                        {toShipCount > 0 && <View style={styles.badge}><Text style={styles.badgeText}>{toShipCount}</Text></View>}
-                        <Icon name="package-variant-closed" size={30} color="#E31C25" />
-                        <Text style={styles.orderStatusText}>To Ship</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.orderStatusItem} onPress={handleToreceive}>
-                        {toReceiveCount > 0 && <View style={styles.badge}><Text style={styles.badgeText}>{toReceiveCount}</Text></View>}
-                        <Icon name="truck-delivery-outline" size={30} color="#E31C25" />
-                        <Text style={styles.orderStatusText}>To Receive</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.orderStatusItem} onPress={handleToreview}>
-                        {toReviewCount > 0 && <View style={styles.badge}><Text style={styles.badgeText}>{toReviewCount}</Text></View>}
-                        <Icon name="message-draw" size={30} color="#E31C25" />
-                        <Text style={styles.orderStatusText}>To Review</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
-
-            {/* ... (actionsSection) ... */}
-            <View style={styles.actionsSection}>
-                <TouchableOpacity style={styles.actionButton} onPress={handleEditprofile}>
-                <Icon name="account-outline" size={22} color="#1C1C1C" />
-                <Text style={styles.actionButtonText}>Edit Profile</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.actionButton} onPress={handleShippingaddress}>
-                <Icon name="map-marker-outline" size={22} color="#1C1C1C" />
-                <Text style={styles.actionButtonText}>Shipping Address</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.actionButton} onPress={handleLogout}>
-                <Icon name="logout" size={22} color="#1C1C1C" />
-                <Text style={styles.actionButtonText}>Logout</Text>
+        <View style={styles.ordersSection}>
+            <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>My Orders</Text>
+                <TouchableOpacity style={styles.ViewButton} onPress={handleViewPurchaseHistory}>
+                    <Text style={styles.viewHistoryText}>View Purchase History </Text>
+                    <Icon name="chevron-right" size={20} color="#E31C25" />
                 </TouchableOpacity>
             </View>
-        </ScrollView>
+            <View style={styles.orderStatusContainer}>
+                <TouchableOpacity style={styles.orderStatusItem} onPress={handleTopay}>
+                    {toPayCount > 0 && <View style={styles.badge}><Text style={styles.badgeText}>{toPayCount}</Text></View>}
+                    <Icon name="wallet-outline" size={30} color="#E31C25" />
+                    <Text style={styles.orderStatusText}>To Pay</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.orderStatusItem} onPress={handleToship}>
+                    {toShipCount > 0 && <View style={styles.badge}><Text style={styles.badgeText}>{toShipCount}</Text></View>}
+                    <Icon name="package-variant-closed" size={30} color="#E31C25" />
+                    <Text style={styles.orderStatusText}>To Ship</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.orderStatusItem} onPress={handleToreceive}>
+                    {toReceiveCount > 0 && <View style={styles.badge}><Text style={styles.badgeText}>{toReceiveCount}</Text></View>}
+                    <Icon name="truck-delivery-outline" size={30} color="#E31C25" />
+                    <Text style={styles.orderStatusText}>To Receive</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.orderStatusItem} onPress={handleToreview}>
+                    {toReviewCount > 0 && <View style={styles.badge}><Text style={styles.badgeText}>{toReviewCount}</Text></View>}
+                    <Icon name="message-draw" size={30} color="#E31C25" />
+                    <Text style={styles.orderStatusText}>To Review</Text>
+                </TouchableOpacity>
+            </View>
+        </View>
+
+        <View style={styles.actionsSection}>
+            <TouchableOpacity style={styles.actionButton} onPress={handleEditprofile}>
+            <Icon name="account-outline" size={22} color="#1C1C1C" />
+            <Text style={styles.actionButtonText}>Edit Profile</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.actionButton} onPress={handleShippingaddress}>
+            <Icon name="map-marker-outline" size={22} color="#1C1C1C" />
+            <Text style={styles.actionButtonText}>Shipping Address</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.actionButton} onPress={handleLogout}>
+            <Icon name="logout" size={22} color="#1C1C1C" />
+            <Text style={styles.actionButtonText}>Logout</Text>
+            </TouchableOpacity>
+        </View>
+
+        {/* LOGOUT CONFIRMATION MODAL */}
+        <Modal
+            animationType="fade"
+            transparent={true}
+            visible={isConfirmModalVisible}
+            onRequestClose={() => setConfirmModalVisible(false)}
+        >
+            <Pressable style={styles.modalOverlay} onPress={() => setConfirmModalVisible(false)}>
+                <Pressable style={styles.alertModalContainer}>
+                    <Icon name="logout-variant" size={48} color="#E31C25" style={{ marginBottom: 12 }} />
+                    <Text style={styles.alertModalTitle}>Confirm Logout</Text>
+                    <Text style={styles.alertModalMessage}>Are you sure you want to log out?</Text>
+                    <View style={styles.modalActions}>
+                        <TouchableOpacity
+                            style={[styles.modalButton, styles.modalSecondaryButton]}
+                            onPress={() => setConfirmModalVisible(false)}
+                        >
+                            <Text style={styles.modalButtonTextSecondary}>Cancel</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={[styles.modalButton, styles.modalPrimaryButton]}
+                            onPress={confirmLogout}
+                        >
+                            <Text style={styles.modalButtonTextPrimary}>Logout</Text>
+                        </TouchableOpacity>
+                    </View>
+                </Pressable>
+            </Pressable>
+        </Modal>
+
+        {/* === NA-UPDATE NA LOGOUT SUCCESS OVERLAY (PLAIN TOAST) === */}
+        <Modal
+            animationType="fade"
+            transparent={true}
+            visible={isLogoutSuccessVisible}
+        >
+            <View style={styles.toastOverlay}>
+                <View style={styles.toastContainer}>
+                    <Text style={styles.toastText}>Logout Successful</Text>
+                </View>
+            </View>
+        </Modal>
+
+    </ScrollView>
     );
 };
 
-// Idagdag ang mga bago at in-update na styles
 const styles = StyleSheet.create({
-    // ... (lahat ng dati mong styles) ...
-    container: {
+    container: { flex: 1, backgroundColor: '#FFFFFF' },
+    header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#EAEAEA', backgroundColor: '#E31C25' },
+    headerTitle: { fontSize: 20, fontFamily: 'Rubik-Medium', color: "#FFFFFF" },
+    profileSection: { alignItems: 'center', marginTop: 40, marginBottom: 40 },
+    avatar: { width: 100, height: 100, borderRadius: 50, backgroundColor: '#E0E0E0', marginBottom: 12 },
+    username: { fontSize: 18, fontFamily: 'Rubik-Medium', color: '#1C1C1C' },
+    ViewButton: { flexDirection: 'row', alignItems: 'center' },
+    ordersSection: { paddingHorizontal: 20, marginBottom: 30 },
+    sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
+    sectionTitle: { fontSize: 16, fontFamily: 'Rubik-Medium', color: '#1C1C1C' },
+    viewHistoryText: { fontSize: 13, fontFamily: 'Rubik-SemiBold', color: '#888' },
+    orderStatusContainer: { flexDirection: 'row', justifyContent: 'space-around' },
+    orderStatusItem: { alignItems: 'center', width: 70 },
+    badge: { position: 'absolute', top: -5, right: 5, backgroundColor: '#EE2323', borderRadius: 10, width: 20, height: 20, justifyContent: 'center', alignItems: 'center', zIndex: 1 },
+    badgeText: { color: 'white', fontSize: 10, fontWeight: 'bold' },
+    orderStatusText: { marginTop: 6, fontSize: 12, color: '#555', fontFamily: 'Rubik-Regular' },
+    actionsSection: { paddingHorizontal: 20, alignItems: 'center' },
+    actionButton: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#EAEAEA', paddingVertical: 15, paddingHorizontal: 20, borderRadius: 15, width: '100%', marginBottom: 15 },
+    actionButtonText: { fontSize: 16, color: '#1C1C1C', marginLeft: 15, fontFamily: 'Rubik-SemiBold' },
+
+    // Styles para sa confirmation modal
+    modalOverlay: {
         flex: 1,
-        backgroundColor: '#FDFBFA',
-    },
-    profileSection: {
-        alignItems: 'center',
-        marginTop: 40,
-        marginBottom: 40,
-    },
-    avatar: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
-        backgroundColor: '#E0E0E0',
-        marginBottom: 12,
-    },
-    username: {
-        fontSize: 18,
-        fontFamily: 'Roboto-Medium',
-        color: '#1C1C1C',
-    },
-    ViewButton: {flexDirection: 'row',   alignItems: 'center',  },
-    ordersSection: {
-        paddingHorizontal: 20,
-        marginBottom: 30,
-    },
-    sectionHeader: { // Bagong style
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 20,
-    },
-    sectionTitle: {
-        fontSize: 16,
-        fontFamily: 'Roboto-Medium',
-        color: '#1C1C1C',
-    },
-    viewHistoryText: { // Bagong style
-        fontSize: 13, fontFamily: 'Roboto-SemiBold', color: '#888',
-    },
-    orderStatusContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-    },
-    orderStatusItem: {
-        alignItems: 'center',
-        width: 70, // Para magkaroon ng space ang badge
-    },
-    badge: { // Bagong style para sa notification count
-        position: 'absolute',
-        top: -5,
-        right: 5,
-        backgroundColor: '#EE2323',
-        borderRadius: 10,
-        width: 20,
-        height: 20,
         justifyContent: 'center',
         alignItems: 'center',
-        zIndex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
-    badgeText: { // Bagong style
-        color: 'white',
-        fontSize: 10,
-        fontWeight: 'bold',
-    },
-    orderStatusText: {
-        marginTop: 6,
-        fontSize: 12,
-        color: '#555',
-        fontFamily: 'Roboto-Regular',
-    },
-    actionsSection: {
+    alertModalContainer: {
+        width: '85%',
+        backgroundColor: 'white',
+        borderRadius: 15,
+        paddingTop: 25,
+        paddingBottom: 20,
         paddingHorizontal: 20,
         alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
     },
-    actionButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#EAEAEA',
-        paddingVertical: 15,
-        paddingHorizontal: 20,
-        borderRadius: 8,
-        width: '100%',
-        marginBottom: 15,
-    },
-    actionButtonText: {
-        fontSize: 16,
+    alertModalTitle: {
+        fontSize: 18,
+        fontFamily: 'Rubik-Bold',
         color: '#1C1C1C',
-        marginLeft: 15,
-        fontFamily: 'Roboto-Regular',
+        marginBottom: 8,
+        textAlign: 'center',
+    },
+    alertModalMessage: {
+        fontSize: 15,
+        fontFamily: 'Rubik-Regular',
+        color: '#4A4A4A',
+        textAlign: 'center',
+        marginBottom: 25,
+        lineHeight: 22,
+    },
+    modalActions: {
+        flexDirection: 'row',
+        width: '100%',
+        justifyContent: 'space-between',
+    },
+    modalButton: {
+        flex: 1,
+        borderRadius: 10,
+        paddingVertical: 12,
+        alignItems: 'center',
+    },
+    modalPrimaryButton: {
+        backgroundColor: '#E31C25',
+        marginLeft: 8,
+    },
+    modalSecondaryButton: {
+        backgroundColor: '#F3F4F6',
+        marginRight: 8,
+        borderWidth: 1,
+        borderColor: '#EAEAEA',
+    },
+    modalButtonTextPrimary: {
+        color: 'white',
+        fontSize: 16,
+        fontFamily: 'Rubik-SemiBold',
+    },
+    modalButtonTextSecondary: {
+        color: '#1C1C1C',
+        fontSize: 16,
+        fontFamily: 'Rubik-SemiBold',
+    },
+    
+    // === BAGONG STYLES PARA SA PLAIN LOGOUT SUCCESS TOAST ===
+    toastOverlay: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    },
+    toastContainer: {
+        backgroundColor: '#333333',
+        borderRadius: 10,
+        paddingVertical: 15,
+        paddingHorizontal: 25,
+        alignItems: 'center',
+        elevation: 5,
+    },
+    toastText: {
+        color: '#FFFFFF',
+        fontSize: 16,
+        fontFamily: 'Rubik-Medium',
+        textAlign: 'center',
     },
 });
 

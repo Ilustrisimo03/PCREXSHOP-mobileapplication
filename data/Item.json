@@ -48,7 +48,8 @@
     "review": 135,
     "percent": 92,
     "category": { "name": "Components" },
-    "type": "CPU Cooling"
+    "type": "CPU Cooling",
+    "isBestSeller": true
   },
   {
     "id": 16,
@@ -65,7 +66,8 @@
     "review": 43,
     "percent": 84,
     "category": { "name": "Components" },
-    "type": "Motherboard"
+    "type": "Motherboard",
+    "isBestSeller": true
   },
   {
     "id": 20,
@@ -99,7 +101,8 @@
     "review": 74,
     "percent": 88,
     "category": { "name": "Components" },
-    "type": "Graphics Card"
+    "type": "Graphics Card",
+    "isBestSeller": true
   },
   {
     "id": 30,
@@ -150,7 +153,8 @@
     "review": 88,
     "percent": 86,
     "category": { "name": "Components"},
-    "type": "Power Supply"
+    "type": "Power Supply",
+    "isBestSeller": true
   },
   {
     "id": 29,
@@ -201,7 +205,8 @@
     "review": 17,
     "percent": 92,
     "category": { "name": "Components"},
-    "type": "Storage (HDD / SSD)"
+    "type": "Storage (HDD / SSD)",
+    "isBestSeller": true
   },
   {
     "id": 24,
@@ -269,7 +274,8 @@
     "review": 28,
     "percent": 94,
     "category": { "name": "Components" },
-    "type": "Memory (RAM)"
+    "type": "Memory (RAM)",
+    "isBestSeller": true
   },
   {
     "id": 11,
@@ -303,7 +309,8 @@
     "review": 33,
     "percent": 96,
     "category": { "name": "Components" },
-    "type": "Processor"
+    "type": "Processor",
+    "isBestSeller": true
   },
   {
     "id": 6,
@@ -405,7 +412,8 @@
     "review": 34,
     "percent": 88,
     "category": { "name": "Peripherals" },
-    "type": "Keyboard"
+    "type": "Keyboard",
+    "isBestSeller": true
   },
   {
     "id": 7,
@@ -439,7 +447,8 @@
     "review": 45,
     "percent": 98,
     "category": { "name": "Peripherals" },
-    "type": "Mouse"
+    "type": "Mouse",
+    "isBestSeller": true
   },
   {
     "id": 10,
@@ -456,7 +465,8 @@
     "review": 1022,
     "percent": 92,
     "category": { "name": "Peripherals" },
-    "type": "Monitor"
+    "type": "Monitor",
+    "isBestSeller": true
   },
   {
     "id": 37,
@@ -507,7 +517,8 @@
     "review": 11,
     "percent": 90,
     "category": { "name": "Peripherals" },
-    "type": "Accessories"
+    "type": "Accessories",
+    "isBestSeller": true
   },
   {
     "id": 12,
@@ -558,7 +569,8 @@
     "review": 3,
     "percent": 86,
     "category": { "name": "Furniture" },
-    "type": "PC Case"
+    "type": "PC Case",
+    "isBestSeller": true
   },
   {
     "id": 1,

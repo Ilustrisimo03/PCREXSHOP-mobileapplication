@@ -1,3 +1,4 @@
+// CategoryProducts.js
 import React, { useState, useEffect } from 'react';
 import { 
     View, 
@@ -9,29 +10,28 @@ import {
     StatusBar,
     TextInput
 } from 'react-native';
-import { useFonts } from 'expo-font'; // Import the useFonts hook
-import { useCart } from '../context/CartContext'; // Already imported, great!
-import ProductCard from '../Components/ProductCard'; // Ang component na ito ay dapat ayusin
+import { useFonts } from 'expo-font';
+import { useCart } from '../context/CartContext';
+import ProductCard from '../Components/ProductCard';
 import Item from '../data/Item.json';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-
-// THEME (Consistent sa HomeScreen)
 const THEME = {
   primary: '#E31C25',
   background: '#FFFFFF',
   text: '#1C1C1C',
   cardBackground: '#FFFFFF',
-  icons: '#FFFFFF'
+  icons: '#FFFFFF',
+  placeholder: '#A0A0A0', // Lighter placeholder text
+  borderColor: '#E0E0E0', // Light border for search input
 };
 
 const CategoryProducts = ({ route, navigation }) => {
-   // Load custom fonts
     const [fontsLoaded] = useFonts({
-      'Roboto-Regular': require('../assets/fonts/Roboto/static/Roboto_Condensed-Regular.ttf'),
-      'Roboto-Bold': require('../assets/fonts/Roboto/static/Roboto_Condensed-Bold.ttf'),
-      'Roboto-Medium': require('../assets/fonts/Roboto/static/Roboto_Condensed-Medium.ttf'),
-      'Roboto-SemiBold': require('../assets/fonts/Roboto/static/Roboto_Condensed-SemiBold.ttf'), // Make sure this font file exists
+      'Rubik-Regular': require('../assets/fonts/Rubik/static/Rubik-Regular.ttf'),
+      'Rubik-Bold': require('../assets/fonts/Rubik/static/Rubik-Bold.ttf'),
+      'Rubik-Medium': require('../assets/fonts/Rubik/static/Rubik-Medium.ttf'),
+      'Rubik-SemiBold': require('../assets/fonts/Rubik/static/Rubik-SemiBold.ttf'),
     });
 
   const { categoryName } = route.params;
@@ -44,10 +44,20 @@ const CategoryProducts = ({ route, navigation }) => {
   useEffect(() => {
     let baseProducts = [];
     
-      if (categoryName.toLowerCase() === 'best seller') {
-      baseProducts = Item.filter(p => parseFloat(p.rate) >= 4.5);
+    // Ensure all items have a category object
+    const allItems = Item.map(item => ({
+        ...item,
+        category: item.category || { name: 'Unknown' }
+    }));
+
+    if (categoryName.toLowerCase() === 'best seller') {
+      baseProducts = allItems.filter(p => p.isBestSeller); 
+    } else if (categoryName.toLowerCase() === 'pre-built') {
+      baseProducts = allItems.filter(p => p.category && p.category.name.toLowerCase() === 'pre-built');
+    } else if (categoryName.toLowerCase() === 'all products') {
+      baseProducts = allItems;
     } else {
-      baseProducts = Item.filter(p => p.category && p.category.name.toLowerCase() === categoryName.toLowerCase());
+      baseProducts = allItems.filter(p => p.category && p.category.name.toLowerCase() === categoryName.toLowerCase());
     }
 
     if (searchQuery.trim() !== '') {
@@ -60,14 +70,10 @@ const CategoryProducts = ({ route, navigation }) => {
     }
   }, [categoryName, searchQuery]);
 
-
-    // Wait until the fonts are loaded before rendering the screen
   if (!fontsLoaded) {
-    return null; // Or you can return a loading indicator here
+    return null;
   }
 
-  // Dito, ipinapasa natin ang buong 'item' sa ProductCard at ProductDetails.
-  // DAPAT mong siguraduhin na ang 'ProductCard.js' ay gumagamit na rin ng 'item.images[0]'.
   const renderProduct = ({ item }) => (
     <View style={styles.gridCardContainer}>
         <ProductCard 
@@ -77,32 +83,29 @@ const CategoryProducts = ({ route, navigation }) => {
     </View>
   );
 
-  
-
   return (
     <SafeAreaView style={styles.container}>
         <StatusBar barStyle="light-content" backgroundColor={THEME.primary} />
         
         <View style={styles.header}>
-            <TouchableOpacity onPress={() => navigation.goBack()}>
-                <Icon name="chevron-left" size={28} color={THEME.cardBackground} />
+            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerIconWrapper}>
+                <Icon name="chevron-left" size={28} color={THEME.icons} />
             </TouchableOpacity>
 
             <View style={styles.searchContainer}>
-                <Icon name="magnify" size={22} color="#888" style={{marginLeft: 8}} />
+                <Icon name="magnify" size={22} color={THEME.placeholder} style={styles.searchIcon} />
                 <TextInput 
                     style={styles.searchInput} 
                     placeholder={`Search in ${categoryName}...`}
-                    placeholderTextColor="#888" 
+                    placeholderTextColor={THEME.placeholder} 
                     value={searchQuery} 
                     onChangeText={setSearchQuery} 
                 />
             </View>
             
-            {/* --- UPDATED CART ICON WITH BADGE --- */}
-            <TouchableOpacity onPress={() => navigation.navigate('Cart')}>
+            <TouchableOpacity onPress={() => navigation.navigate('Cart')} style={styles.headerIconWrapper}>
                 <View>
-                    <Icon name="cart-outline" size={28} color={THEME.icons} />
+                    <Icon name="cart-outline" size={26} color={THEME.icons} />
                     {itemCount > 0 && (
                       <View style={styles.badgeContainer}>
                         <Text style={styles.badgeText}>{itemCount}</Text>
@@ -110,13 +113,30 @@ const CategoryProducts = ({ route, navigation }) => {
                     )}
                 </View>
             </TouchableOpacity>
-            <TouchableOpacity>
-                <Icon name="account-outline" size={28} color={THEME.cardBackground} style={styles.headerIcon} />
+            <TouchableOpacity style={styles.headerIconWrapper}>
+                <Icon name="account-outline" size={26} color={THEME.icons} />
             </TouchableOpacity>
         </View>
 
          <View style={styles.titleContainer}>
             <Text style={styles.titleText}>{categoryName}</Text>
+            {/* Optional subtitle based on category */}
+            {categoryName.toLowerCase() === 'pre-built' && 
+              <Text style={styles.subtitleText}>Ready-to-go powerful machines</Text>
+            }
+            {categoryName.toLowerCase() === 'best seller' && 
+              <Text style={styles.subtitleText}>Our top-selling products by demand</Text>
+            }
+            {categoryName.toLowerCase() === 'components' && 
+              <Text style={styles.subtitleText}>Our top-selling products by demand</Text>
+            }
+            {categoryName.toLowerCase() === 'peripherals' && 
+              <Text style={styles.subtitleText}>Our top-selling products by demand</Text>
+            }
+            {categoryName.toLowerCase() === 'furniture' && 
+              <Text style={styles.subtitleText}>Our top-selling products by demand</Text>
+            }
+           
         </View>
 
         <FlatList
@@ -124,11 +144,12 @@ const CategoryProducts = ({ route, navigation }) => {
             renderItem={renderProduct}
             keyExtractor={item => item.id.toString()}
             numColumns={2}
-            contentContainerStyle={{ paddingHorizontal: 8, paddingTop: 10 }}
+            contentContainerStyle={styles.listContentContainer}
             ListEmptyComponent={
                 <View style={styles.noResultsContainer}>
+                    <Icon name="information-outline" size={50} color={THEME.placeholder} style={{marginBottom: 10}} />
                     <Text style={styles.noResultsText}>
-                      {searchQuery ? 'No Results Found' : 'No Products in this Category'}
+                      {searchQuery ? 'No matching products found.' : `No products available in "${categoryName}".`}
                     </Text>
                 </View>
             }
@@ -137,78 +158,99 @@ const CategoryProducts = ({ route, navigation }) => {
   );
 };
 
-// ... (Walang pagbabago sa Styles)
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: THEME.background },
+    container: { 
+        flex: 1, 
+        backgroundColor: THEME.background 
+    },
     header: { 
         backgroundColor: THEME.primary, 
         flexDirection: 'row', 
         alignItems: 'center', 
-        paddingHorizontal: 12, 
-        paddingVertical: 10,
-        gap: 8
+        paddingHorizontal: 16,
+        paddingVertical: 10, 
+        gap: 12, // Gap between elements
+    },
+    headerIconWrapper: {
+        padding: 4, // Add padding to make icons easily tappable
     },
     searchContainer: { 
         flex: 1,
         flexDirection: 'row', 
         alignItems: 'center', 
         backgroundColor: THEME.cardBackground, 
-        borderRadius: 8, 
-        height: 40 
+        borderRadius: 15, // More rounded search bar
+        height: 44, // Taller search bar
+    },
+    searchIcon: {
+        marginLeft: 12, // Icon slightly more to the right
     },
     searchInput: { 
         flex: 1, 
         paddingHorizontal: 10, 
-        fontSize: 14, 
+        fontSize: 14, // Slightly larger font size
         color: THEME.text ,
-        fontFamily: 'Roboto-Regular'
+        height: '100%', // Ensure input fills the container height
     },
-    headerIcon: { 
-        marginLeft: 4
+    badgeContainer: {
+        position: 'absolute',
+        top: -5,
+        right: -8,
+        backgroundColor: THEME.background, // Background of the badge itself
+        borderRadius: 10, // More rounded badge
+        width: 20, // Larger badge
+        height: 20, // Larger badge
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 1.5, // Slightly thicker border
+        borderColor: THEME.primary, // Red border for contrast
     },
-     // --- ADDED STYLES FOR THE BADGE ---
-  badgeContainer: {
-    position: 'absolute',
-    top: -4,
-    right: -6,
-    backgroundColor: THEME.background,
-    borderRadius: 9,
-    width: 18,
-    height: 18,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: THEME.background
-  },
-  badgeText: {
-    color: THEME.primary,
-    fontSize: 12,
-    fontFamily: 'Roboto-Bold',
-  },
+    badgeText: {
+        color: THEME.primary,
+        fontSize: 12,
+        fontFamily: 'Rubik-Bold',
+    },
     titleContainer: {
         paddingHorizontal: 20,
-        paddingTop: 16,
+        paddingVertical: 18, // Increased vertical padding
         backgroundColor: THEME.background,
+        borderBottomWidth: 1, // Subtle separator
+        borderBottomColor: '#F0F0F0',
+        marginBottom: 8, // Space before the list
     },
     titleText: {
-        fontSize: 18,
-        fontFamily: 'Roboto-Medium',
+        fontSize: 24, // Larger title
+        fontFamily: 'Rubik-Bold', // Bolder title
         color: THEME.text,
+        letterSpacing: -0.5,
+        marginBottom: 4,
+    },
+    subtitleText: {
+        fontSize: 14,
+        fontFamily: 'Rubik-Regular',
+        color: THEME.placeholder,
+    },
+    listContentContainer: { 
+        paddingHorizontal: 12, // Overall padding for the grid
+        paddingBottom: 20, // Padding at the bottom of the list
     },
     gridCardContainer: { 
         width: '50%', 
-        padding: 4 
     },
     noResultsContainer: { 
         alignItems: 'center', 
         justifyContent: 'center', 
-        paddingTop: 50, 
-        flex: 1 
+        paddingVertical: 80, // More vertical padding
+        flex: 1, 
+        backgroundColor: THEME.background,
     },
     noResultsText: { 
         fontSize: 16, 
-        fontFamily: 'Roboto-Medium',
-        color: '#6c757d' 
+        fontFamily: 'Rubik-Medium',
+        color: THEME.placeholder, // Lighter text color
+        textAlign: 'center',
+        marginTop: 10,
+        paddingHorizontal: 30,
     },
 });
 

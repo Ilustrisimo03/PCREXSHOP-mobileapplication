@@ -56,7 +56,7 @@ const BannerSlider = () => {
 const styles = StyleSheet.create({
   sliderWrapper: { height: 180, marginTop: 16 },
   bannerContainer: { width: width, height: 180, paddingHorizontal: 16 },
-  bannerImage: { width: '100%', height: '100%', borderRadius: 12 },
+  bannerImage: { width: '100%', height: '100%', borderRadius: 15 },
   pagination: { position: 'absolute', bottom: 15, flexDirection: 'row', alignSelf: 'center' },
   dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: 'rgba(255, 255, 255, 0.5)', marginHorizontal: 4 },
   dotActive: { backgroundColor: 'rgba(255, 255, 255, 0.9)', width: 20 },
