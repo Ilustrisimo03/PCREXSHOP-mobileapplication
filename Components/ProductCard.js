@@ -13,9 +13,10 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useFonts } from 'expo-font';
 import { useCart } from '../context/CartContext';
 
+
 const THEME = {
   COLORS: {
-    primary: '#E31C25',
+    primary: '#074ec2',
     text: '#1C1C1C',
     background: '#FAF5F1',
     card: '#FFFFFF',
@@ -26,12 +27,16 @@ const THEME = {
   },
 };
 
-const formatPrice = (price) => {
-  const priceNumber = parseFloat(price);
-  if (isNaN(priceNumber)) {
-    return '₱--.--';
+// --- Currency Formatting Utility ---
+const formatPrice = (value) => {
+  const num = parseFloat(value);
+
+  // Check if integer or may decimal
+  if (Number.isInteger(num)) {
+    return `₱${num.toLocaleString()}`;
+  } else {
+    return `₱${num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   }
-  return `₱${priceNumber.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 };
 
 const ProductCard = ({ product, onPress }) => {
@@ -52,7 +57,7 @@ const ProductCard = ({ product, onPress }) => {
   useEffect(() => {
     Animated.timing(fadeAnim, {
       toValue: 1,
-      duration: 1000,
+      duration: 0,
       useNativeDriver: true,
     }).start();
   }, [fadeAnim]);
@@ -72,7 +77,7 @@ const ProductCard = ({ product, onPress }) => {
       setSuccessToastVisible(true);
       setTimeout(() => {
         setSuccessToastVisible(false);
-      }, 1500);
+      }, 5000);
     } else {
       setStockModalMessage(`You have reached the stock limit of ${product.stock} for this item in your cart.`);
       setStockModalVisible(true);
@@ -243,7 +248,7 @@ const styles = StyleSheet.create({
     flex: 1,
     color: THEME.COLORS.text,
     fontSize: 14,
-    fontFamily: 'Rubik-Bold',
+    fontFamily: 'Rubik-Medium',
     marginRight: 8,
   },
   ratingContainer: {
@@ -270,7 +275,7 @@ const styles = StyleSheet.create({
   price: {
     color: THEME.COLORS.primary,
     fontSize: 18,
-    fontFamily: 'Rubik-Bold',
+    fontFamily: 'Rubik-Medium',
   },
   addToCartButton: {
     width: 44,
@@ -300,8 +305,8 @@ const styles = StyleSheet.create({
   alertModalMessage: { fontSize: 15, fontFamily: 'Rubik-Regular', color: '#4A4A4A', textAlign: 'center', marginBottom: 25, lineHeight: 22 },
   alertModalButton: { backgroundColor: THEME.COLORS.primary, borderRadius: 10, paddingVertical: 12, width: '100%', alignItems: 'center' },
   alertModalButtonText: { color: THEME.COLORS.card, fontSize: 16, fontFamily: 'Rubik-SemiBold' },
-  toastOverlay: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.4)' },
-  toastContainer: { backgroundColor: '#333333', borderRadius: 10, paddingVertical: 15, paddingHorizontal: 25, alignItems: 'center', elevation: 5 },
+  toastOverlay: { flex: 1, justifyContent: 'center', alignItems: 'center', },
+  toastContainer: { backgroundColor: '#4BB543', borderRadius: 10, paddingVertical: 15, paddingHorizontal: 25, alignItems: 'center'},
   toastText: { color: '#FFFFFF', fontSize: 16, fontFamily: 'Rubik-Medium', textAlign: 'center' },
 });
 

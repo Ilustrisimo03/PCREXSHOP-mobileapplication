@@ -4,11 +4,11 @@
     "slug": "PCREXSHOP-mobileapplication",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/pcrexlogo.png",
+    "icon": "./assets//PCREXBIGLOGOSPLASH.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/pcrexlogo.png",
+      "image": "./assets//PCREXBIGLOGOSPLASH.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -17,12 +17,12 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/pcrexlogo.png",
+        "foregroundImage": "./assets//PCREXBIGLOGOSPLASH.png",
         "backgroundColor": "#ffffff"
       }
     },
     "web": {
-      "favicon": "./assets/pcrexlogo.png"
+      "favicon": "./assets//PCREXBIGLOGOSPLASH.png"
     }
   }
 }

@@ -7,7 +7,7 @@ import ProductCard from './ProductCard';
 
 const { width } = Dimensions.get('window');
 const THEME = {
-  primary: '#E31C25',
+  primary: '#074ec2',
   secondary: '#5856D6', // Original secondary color for Pre-built
   text: '#1C1C1C',
   background: '#FAFAFA',
@@ -38,9 +38,6 @@ const PreBuiltSection = ({ title, data, navigation }) => {
     <View style={styles.sectionContainer}>
       <View style={styles.headerContainer}>
         <View style={styles.titleContainer}>
-          <View style={styles.iconBadge}>
-            <Icon name="desktop-tower" size={20} color={THEME.secondary} />
-          </View>
           <Text style={styles.sectionTitle}>Pre-Built</Text>
         </View>
         <TouchableOpacity style={styles.moreButton} onPress={handleMorePress}>
@@ -81,18 +78,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: 18,
     marginBottom: 16,
   },
   titleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10, // Increased gap for better spacing
-  },
-  iconBadge: {
-    backgroundColor: 'rgba(88, 86, 214, 0.15)', // Slightly more opaque
-    padding: 8, // Larger padding
-    borderRadius: 12, // More rounded badge
   },
   sectionTitle: {
     fontSize: 18, // Slightly larger title
@@ -103,10 +95,6 @@ const styles = StyleSheet.create({
   moreButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(227, 28, 37, 0.1)', // Red primary background
-    paddingHorizontal: 14, // Increased padding
-    paddingVertical: 8, // Increased padding
-    borderRadius: 20, // More pill-shaped button
     gap: 6,
   },
   moreText: {

@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 // THEME
 const THEME = {
-  primary: '#EE2323',
+  primary: '#074ec2',
   background: '#FFFFFF',
   text: '#1C1C1C',
   success: '#22C55E'
@@ -67,8 +67,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 10,
     backgroundColor: THEME.background,
-    borderBottomWidth: 1,
-    borderBottomColor: '#EAEAEA'
   },
   headerTitle: { // Kinuha mula sa Checkout screen
     fontSize: 20,

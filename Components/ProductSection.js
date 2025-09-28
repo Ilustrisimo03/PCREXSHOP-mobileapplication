@@ -6,7 +6,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ProductCard from './ProductCard';
 
 const THEME = {
-  primary: '#E31C25',
+  primary: '#074ec2',
   text: '#1C1C1C',
 };
 

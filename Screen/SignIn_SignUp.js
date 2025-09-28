@@ -115,15 +115,15 @@ const SignIn_SignUp = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+    
       <ScrollView
         contentContainerStyle={styles.scrollViewContent}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.innerContainer}>
-          <Image source={require('../assets/pcrexlogo.png')} style={styles.brandImage} resizeMode="contain" />
-          <Text style={styles.BrandName}>PC Rex Shop</Text>
+          <Image source={require('../assets/PCREXBIGLOGOMOBILE.png')} style={styles.brandImage} resizeMode="contain" />
+          
           <Text style={styles.welcomeText}>{isLogin ? "Welcome Back!" : "Create an Account"}</Text>
 
           <View style={styles.formWrapper}>
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFFFFF' },
   scrollViewContent: { flexGrow: 1, justifyContent: 'center', paddingVertical: 20 },
   innerContainer: { alignItems: 'center', paddingHorizontal: 25 },
-  brandImage: { width: '70%', height: 80 },
+  brandImage: { width: '50%', height: 80 },
   BrandName: { fontSize: 14, fontFamily: 'Rubik-Medium', color: '#1C1C1C', bottom: 20 },
   welcomeText: { fontSize: 24, fontFamily: 'Rubik-SemiBold', color: '#1C1C1C', marginBottom: 30 },
   formWrapper: { width: '100%', alignItems: 'center' },
@@ -197,8 +197,8 @@ const styles = StyleSheet.create({
   inputIcon: { marginRight: 10 },
   input: { flex: 1, paddingVertical: 12, fontSize: 15, fontFamily: 'Rubik-Regular', color: '#333333' },
   forgotPasswordContainer: { width: '100%', alignItems: 'flex-end', marginBottom: 15 },
-  forgotPasswordText: { color: '#E31C25', fontSize: 14, fontFamily: 'Rubik-Medium' },
-  button: { backgroundColor: '#E31C25', paddingVertical: 15, borderRadius: 15, alignItems: 'center', width: '100%', marginTop: 5 },
+  forgotPasswordText: { color: '#074ec2', fontSize: 14, fontFamily: 'Rubik-Medium' },
+  button: { backgroundColor: '#074ec2', paddingVertical: 15, borderRadius: 15, alignItems: 'center', width: '100%', marginTop: 5 },
   buttonText: { fontSize: 16, fontFamily: 'Rubik-Bold', color: '#FFFFFF' },
   dividerContainer: { flexDirection: 'row', alignItems: 'center', width: '100%', marginVertical: 25 },
   dividerLine: { flex: 1, height: 1, backgroundColor: '#DDDDDD' },
@@ -208,27 +208,21 @@ const styles = StyleSheet.create({
   googleButtonText: { fontSize: 16, fontFamily: 'Rubik-Medium', color: '#333333' },
   togglerContainer: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 30 },
   togglerText: { fontSize: 14, fontFamily: 'Rubik-Regular', color: '#555555' },
-  togglerLink: { fontSize: 14, fontFamily: 'Rubik-Bold', color: '#E31C25', marginLeft: 5 },
+  togglerLink: { fontSize: 14, fontFamily: 'Rubik-Bold', color: '#074ec2', marginLeft: 5 },
   
   // Styles para sa bagong modal (parang toast/card)
   modalOverlay: {
     flex: 1,
     justifyContent: 'center', // Ito ang nagpapagitna vertically
     alignItems: 'center',      // Ito ang nagpapagitna horizontally
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
   },
   alertModalContainer: {
     width: '90%',
-    backgroundColor: '#333333', // Madilim na background para sa contrast
+    backgroundColor: '#4BB543', // Madilim na background para sa contrast
     borderRadius: 10,
     paddingVertical: 15,
     paddingHorizontal: 20,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
   },
   alertModalTitle: {
     fontSize: 16,
@@ -240,7 +234,7 @@ const styles = StyleSheet.create({
   alertModalMessage: {
     fontSize: 14,
     fontFamily: 'Rubik-Regular',
-    color: '#E0E0E0', // Bahagyang gray na puti
+    color: '#FAFAFA', // Bahagyang gray na puti
     textAlign: 'center',
   },
 });

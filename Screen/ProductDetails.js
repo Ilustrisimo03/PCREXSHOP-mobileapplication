@@ -19,8 +19,8 @@ import { useCart } from '../context/CartContext';
 
 // THEME
 const THEME = {
-  primary: '#E31C25',
-  background: '#FFFFFF',
+  primary: '#074ec2',
+  background: '#FAFAFA',
   text: '#1C1C1C',
   disabled: '#CCCCCC', // New color for disabled buttons
   disabledText: '#666666', // New color for disabled button text
@@ -69,7 +69,7 @@ const ProductDetails = ({ route, navigation }) => {
       setSuccessToastVisible(true);
       setTimeout(() => {
         setSuccessToastVisible(false);
-      }, 1000);
+      }, 150);
     } else {
       setStockModalMessage(`You have reached the stock limit of ${product.stock} for this item in your cart.`);
       setStockModalVisible(true);
@@ -130,12 +130,12 @@ const ProductDetails = ({ route, navigation }) => {
 
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Icon name="chevron-left" size={28} color={THEME.text} />
+          <Icon name="chevron-left" size={30} color={'#FFFFFF'} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Details</Text>
         <TouchableOpacity onPress={() => navigation.navigate('Cart')}>
           <View>
-            <Icon name="cart-outline" size={28} color={THEME.text} />
+            <Icon name="cart-outline" size={28} color={'#FFFFFF'} />
             {itemCount > 0 && (
               <View style={styles.badgeContainer}>
                 <Text style={styles.badgeText}>{itemCount}</Text>
@@ -186,7 +186,7 @@ const ProductDetails = ({ route, navigation }) => {
               <Text style={styles.infoText}>{product.rate} Stars</Text>
             </View>
             <View style={styles.infoBox}>
-              <Icon name="package-variant-closed" size={20} color={THEME.primary} />
+              <Icon name="package-variant-closed" size={20} color={'#EE2323'} />
               <Text style={[styles.infoText, isOutOfStock && styles.outOfStockText]}>
                 {isOutOfStock ? 'Out of Stock' : `${product.stock} in stock`}
               </Text>
@@ -308,10 +308,25 @@ const ProductDetails = ({ route, navigation }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: THEME.background },
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#EAEAEA' },
-  headerTitle: { fontSize: 20, fontFamily: 'Rubik-Medium', color: THEME.text },
-  badgeContainer: { position: 'absolute', top: -4, right: -6, backgroundColor: THEME.primary, borderRadius: 9, width: 18, height: 18, justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: THEME.background },
-  badgeText: { color: THEME.background, fontSize: 12, fontFamily: 'Rubik-Bold', },
+  header: { flexDirection: 'row', backgroundColor: THEME.primary, alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 10, },
+  headerTitle: { fontSize: 20, fontFamily: 'Rubik-Medium', color: '#FFFFFF' },
+  badgeContainer: {
+  position: 'absolute',
+  top: -4,
+  right: -6,
+  backgroundColor: '#EE2323',
+  borderRadius: 9,
+  width: 18,
+  height: 18,
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+
+badgeText: {
+  color: '#FFFFFF',
+  fontSize: 10,
+  fontWeight: 'bold'
+},
   scrollContentContainer: { paddingBottom: 100, },
   carouselContainer: { height: 350, backgroundColor: '#F3F4F6', },
   carouselImage: { width: screenWidth, height: '100%', },
@@ -337,11 +352,11 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     borderTopWidth: 1,
     borderTopColor: '#EAEAEA',
-    backgroundColor: THEME.background,
+    backgroundColor: '#FFFFFF',
   },
 
   addToCartButton: {
-    backgroundColor: THEME.background, // white
+    backgroundColor: '#FFFFFF', // white
     borderWidth: 1,
     borderColor: THEME.primary,
     flexDirection: 'row',
@@ -425,15 +440,15 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+  
   },
   toastContainer: {
-    backgroundColor: '#333333',
+    backgroundColor: '#4BB543',
     borderRadius: 10,
     paddingVertical: 15,
     paddingHorizontal: 25,
     alignItems: 'center',
-    elevation: 5,
+  
   },
   toastText: {
     color: '#FFFFFF',

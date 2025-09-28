@@ -1,7 +1,22 @@
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, FlatList, TouchableOpacity, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useFonts } from 'expo-font';
+
 import { useOrders } from '../context/OrderContext';
+
+  // --- Currency Formatting Utility ---
+const formatPrice = (value) => {
+    const num = parseFloat(value);
+    if (isNaN(num)) return '₱0.00'; // Handle non-numeric values
+
+    if (Number.isInteger(num)) {
+        return `₱${num.toLocaleString()}`;
+    } else {
+        return `₱${num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+};
+
 
 const statusStyles = {
     'To Pay': { color: '#FFA500', icon: 'wallet-outline' },
@@ -12,6 +27,7 @@ const statusStyles = {
     'Cancelled': { color: '#E74C3C', icon: 'close-circle-outline' },
 };
 
+
 const OrderItem = ({ item }) => (
     <View style={styles.orderItemContainer}>
         <Image source={{ uri: item?.images?.[0] }} style={styles.orderItemImage} />
@@ -19,12 +35,24 @@ const OrderItem = ({ item }) => (
             <Text style={[styles.orderItemName, { fontFamily: 'Rubik-SemiBold' }]} numberOfLines={2}>{item.name}</Text>
             <Text style={[styles.orderItemQuantity, { fontFamily: 'Rubik-Regular' }]}>Qty: {item.quantity || 1}</Text>
         </View>
-        <Text style={[styles.orderItemPrice, { fontFamily: 'Rubik-Bold' }]}>₱{(parseFloat(item.price) * (item.quantity || 1)).toLocaleString()}</Text>
+        <Text style={[styles.orderItemPrice, { fontFamily: 'Rubik-Medium' }]}> {formatPrice(parseFloat(item.price) * (item.quantity || 1))}</Text>
     </View>
 );
 
 const OrderHistoryCard = ({ order }) => {
     const statusInfo = statusStyles[order.status] || { color: '#000', icon: 'help-circle-outline' };
+
+      const [fontsLoaded] = useFonts({
+            'Rubik-Regular': require('../assets/fonts/Rubik/static/Rubik-Regular.ttf'),
+            'Rubik-Bold': require('../assets/fonts/Rubik/static/Rubik-Bold.ttf'),
+            'Rubik-Medium': require('../assets/fonts/Rubik/static/Rubik-Medium.ttf'),
+            'Rubik-SemiBold': require('../assets/fonts/Rubik/static/Rubik-SemiBold.ttf'),
+        });
+    
+        if (!fontsLoaded) {
+            return null;
+        }
+    
 
     return (
         <View style={styles.card}>
@@ -42,11 +70,12 @@ const OrderHistoryCard = ({ order }) => {
 
             <View style={styles.cardFooter}>
                 <Text style={[styles.totalLabel, { fontFamily: 'Rubik-Regular' }]}>Total:</Text>
-                <Text style={[styles.totalValue, { fontFamily: 'Rubik-Bold' }]}>₱{order.total.toLocaleString()}</Text>
+                <Text style={[styles.totalValue, { fontFamily: 'Rubik-SemiBold' }]}>{formatPrice(order.total)}</Text>
             </View>
         </View>
     );
 };
+
 
 const ViewOrder = ({ navigation }) => {
     const { orders } = useOrders();
@@ -58,9 +87,10 @@ const ViewOrder = ({ navigation }) => {
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Icon name="chevron-left" size={26} color="#333" />
+                    <Icon name="chevron-left" size={30} color="#FFFFFF" />
                 </TouchableOpacity>
-                <Text style={[styles.headerTitle, { fontFamily: 'Rubik-Bold' }]}>Purchase History</Text>
+                <Text style={styles.headerTitle}>Purchase History</Text>
+                <View style={{ width: 28 }} />
             </View>
             <FlatList
                 data={sortedOrders}
@@ -75,10 +105,21 @@ const ViewOrder = ({ navigation }) => {
 
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#FFFFFF' },
-    header: { flexDirection: 'row', alignItems: 'center', padding: 16, backgroundColor: '#FFF', borderBottomWidth: 1, borderBottomColor: '#E9ECEF' },
-    headerTitle: { fontSize: 22, marginLeft: 16, color: '#212529' }, // Applied fontFamily directly to Text
+    header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingHorizontal: 15,
+        paddingVertical: 12,
+        backgroundColor: '#074ec2',
+    },
+    headerTitle: {
+        fontSize: 20,
+        fontFamily: 'Rubik-Medium',
+        color: "#FFFFFF",
+    },
     listContainer: { padding: 12 },
-    card: { backgroundColor: '#FFF', borderRadius: 12, marginBottom: 16, shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 10, elevation: 5 },
+    card: { backgroundColor: '#FFF', borderRadius: 12, marginBottom: 16, borderWidth:1,borderColor: '#eee',  },
     cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 14, paddingTop: 14, paddingBottom: 10 },
     statusContainer: { flexDirection: 'row', alignItems: 'center' },
     orderStatus: { fontSize: 14, marginLeft: 6 }, // Applied fontFamily directly to Text
@@ -91,7 +132,7 @@ const styles = StyleSheet.create({
     orderItemPrice: { fontSize: 15, color: '#495057' }, // Applied fontFamily directly to Text
     cardFooter: { flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 14, borderTopWidth: 1, borderTopColor: '#F1F3F5' },
     totalLabel: { fontSize: 14, color: '#495057' }, // Applied fontFamily directly to Text
-    totalValue: { fontSize: 18, marginLeft: 8, color: '#EE2323' }, // Applied fontFamily directly to Text
+    totalValue: { fontSize: 18, marginLeft: 8, color: '#074ec2' }, // Applied fontFamily directly to Text
     emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingTop: 100 },
     emptyText: { marginTop: 20, fontSize: 17, color: '#ADB5BD' }, // Applied fontFamily directly to Text
 });

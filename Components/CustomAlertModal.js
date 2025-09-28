@@ -7,14 +7,12 @@ const { width } = Dimensions.get('window');
 
 // THEME - Ensure this is consistent or passed as prop if theme can change
 const THEME = {
-  primary: '#EE2323',
+  primary: '#074ec2',
   background: '#F0F2F5',
   cardBackground: '#FFFFFF',
   text: '#1C1C1C',
   subText: '#666666',
   borderColor: '#E0E0E0',
-  success: '#28A745',
-  warning: '#FFC107',
 };
 
 const CustomAlertModal = ({
@@ -25,7 +23,7 @@ const CustomAlertModal = ({
   onCancel,
   confirmText = 'OK',
   cancelText = 'Cancel',
-  type = 'info', // 'info', 'confirm', 'error', 'success', 'warning'
+ 
 }) => {
   const [fontsLoaded] = useFonts({
     'Rubik-Regular': require('../assets/fonts/Rubik/static/Rubik-Regular.ttf'),
@@ -36,22 +34,7 @@ const CustomAlertModal = ({
 
   if (!fontsLoaded) return null;
 
-  const getIconAndColor = () => {
-    switch (type) {
-      case 'error':
-        return { name: 'alert-circle', color: THEME.primary };
-      case 'success':
-        return { name: 'check-circle', color: THEME.success };
-      case 'warning':
-        return { name: 'exclamation-triangle', color: THEME.warning };
-      case 'confirm':
-        return { name: 'verified', color: THEME.success };
-      default:
-        return { name: 'information', color: THEME.primary };
-    }
-  };
-
-  const { name: iconName, color: iconColor } = getIconAndColor();
+ 
 
   return (
     <Modal
@@ -63,7 +46,7 @@ const CustomAlertModal = ({
       <View style={modalStyles.centeredView}>
         <View style={modalStyles.modalView}>
           <View style={modalStyles.modalHeader}>
-            <Icon name={iconName} size={30} color={iconColor} style={modalStyles.modalIcon} />
+            
             <Text style={modalStyles.modalTitle}>{title}</Text>
           </View>
           <Text style={modalStyles.modalMessage}>{message}</Text>

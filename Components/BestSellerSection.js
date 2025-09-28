@@ -7,7 +7,7 @@ import ProductCard from './ProductCard';
 
 const { width } = Dimensions.get('window');
 const THEME = {
-  primary: '#E31C25',
+  primary: '#074ec2',
   secondary: '#FFD700', // Gold color for Best Seller icon
   text: '#1C1C1C',
   background: '#FFFFFF',
@@ -38,9 +38,6 @@ const BestSellerSection = ({ title, data, navigation }) => {
     <View style={styles.sectionContainer}>
       <View style={styles.headerContainer}>
         <View style={styles.titleContainer}>
-          <View style={styles.iconBadge}>
-            <Icon name="crown" size={20} color={THEME.secondary} />
-          </View>
           <Text style={styles.sectionTitle}>Best Seller</Text>
         </View>
         <TouchableOpacity style={styles.moreButton} onPress={handleMorePress}>
@@ -57,9 +54,7 @@ const BestSellerSection = ({ title, data, navigation }) => {
             index === 0 && styles.firstCard,
             index === data.length - 1 && styles.lastCard
           ]}>
-            <View style={styles.bestSellerBadge}>
-              <Text style={styles.bestSellerRank}>#{index + 1}</Text>
-            </View>
+           
             <ProductCard 
               product={item} 
               onPress={() => navigation.navigate('ProductDetails', { product: item })}
@@ -87,18 +82,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16, 
+    paddingHorizontal: 18, 
     marginBottom: 16,
   },
   titleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-  },
-  iconBadge: {
-    backgroundColor: 'rgba(255, 215, 0, 0.25)', // Slightly more opaque gold
-    padding: 8,
-    borderRadius: 12,
   },
   sectionTitle: {
     fontSize: 18,
@@ -109,10 +99,6 @@ const styles = StyleSheet.create({
   moreButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(227, 28, 37, 0.1)',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 20,
     gap: 6,
   },
   moreText: {
@@ -132,26 +118,6 @@ const styles = StyleSheet.create({
   },
   lastCard: {
     marginRight: 0,
-  },
-  bestSellerBadge: {
-    position: 'absolute',
-    top: 10, // Slightly more padding
-    left: 10, // Slightly more padding
-    backgroundColor: '#FFBE0B', // A vibrant gold color
-    borderRadius: 15, // More rounded badge
-    paddingHorizontal: 10, // Increased padding
-    paddingVertical: 5, // Increased padding
-    zIndex: 10,
-    shadowColor: THEME.shadowColor,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25, // More prominent shadow
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  bestSellerRank: {
-    color: '#FFFFFF',
-    fontSize: 13, // Slightly larger font
-    fontFamily: 'Rubik-Bold',
   },
 });
 

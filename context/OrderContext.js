@@ -41,8 +41,7 @@ export const OrderProvider = ({ children }) => {
     const newOrder = {
       id: `order_${Date.now()}`,
       ...orderData,
-      // ✅ If paymentMethod = Gcash → diretso "To Ship"
-      status: orderData.paymentMethod === 'gcash' ? 'To Ship' : 'To Pay',
+      status: (orderData.paymentMethod === 'GCASH' || orderData.paymentMethod === 'COD') ? 'To Ship' : 'To Pay',
       orderDate: new Date().toISOString(),
     };
     setOrders((prev) => [newOrder, ...prev]);

@@ -17,7 +17,7 @@ import Item from '../data/Item.json';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const THEME = {
-  primary: '#E31C25',
+  primary: '#074ec2',
   background: '#FFFFFF',
   text: '#1C1C1C',
   cardBackground: '#FFFFFF',
@@ -87,36 +87,50 @@ const CategoryProducts = ({ route, navigation }) => {
     <SafeAreaView style={styles.container}>
         <StatusBar barStyle="light-content" backgroundColor={THEME.primary} />
         
-        <View style={styles.header}>
-            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerIconWrapper}>
-                <Icon name="chevron-left" size={28} color={THEME.icons} />
+          <View style={styles.header}>
+            {/* Back Icon - Left */}
+            <TouchableOpacity 
+              onPress={() => navigation.goBack()} 
+              style={styles.headerIconWrapper}
+            >
+              <Icon name="chevron-left" size={28} color={THEME.icons} />
             </TouchableOpacity>
 
-            <View style={styles.searchContainer}>
-                <Icon name="magnify" size={22} color={THEME.placeholder} style={styles.searchIcon} />
-                <TextInput 
-                    style={styles.searchInput} 
-                    placeholder={`Search in ${categoryName}...`}
-                    placeholderTextColor={THEME.placeholder} 
-                    value={searchQuery} 
-                    onChangeText={setSearchQuery} 
-                />
-            </View>
-            
-            <TouchableOpacity onPress={() => navigation.navigate('Cart')} style={styles.headerIconWrapper}>
+            {/* Right Side Icons */}
+            <View style={styles.rightIcons}>
+              {/* Search */}
+              <TouchableOpacity 
+                onPress={() => navigation.navigate('SearchProduct')} 
+                style={styles.searchIconContainer}
+              >
+                <Icon name="magnify" size={26} color={THEME.icons} />
+              </TouchableOpacity>
+
+              {/* Cart with Badge */}
+              <TouchableOpacity 
+                onPress={() => navigation.navigate('Cart')} 
+                style={styles.headerIconWrapper}
+              >
                 <View>
-                    <Icon name="cart-outline" size={26} color={THEME.icons} />
-                    {itemCount > 0 && (
-                      <View style={styles.badgeContainer}>
-                        <Text style={styles.badgeText}>{itemCount}</Text>
-                      </View>
-                    )}
+                  <Icon name="cart-outline" size={26} color={THEME.icons} />
+                  {itemCount > 0 && (
+                    <View style={styles.badgeContainer}>
+                      <Text style={styles.badgeText}>{itemCount}</Text>
+                    </View>
+                  )}
                 </View>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.headerIconWrapper}>
+              </TouchableOpacity>
+
+              {/* Account */}
+              <TouchableOpacity 
+                onPress={() => navigation.navigate('Account')} 
+                style={styles.headerIconWrapper}
+              >
                 <Icon name="account-outline" size={26} color={THEME.icons} />
-            </TouchableOpacity>
-        </View>
+              </TouchableOpacity>
+            </View>
+          </View>
+
 
          <View style={styles.titleContainer}>
             <Text style={styles.titleText}>{categoryName}</Text>
@@ -125,16 +139,19 @@ const CategoryProducts = ({ route, navigation }) => {
               <Text style={styles.subtitleText}>Ready-to-go powerful machines</Text>
             }
             {categoryName.toLowerCase() === 'best seller' && 
-              <Text style={styles.subtitleText}>Our top-selling products by demand</Text>
+              <Text style={styles.subtitleText}>Our most popular picks loved by gamers</Text>
             }
             {categoryName.toLowerCase() === 'components' && 
-              <Text style={styles.subtitleText}>Our top-selling products by demand</Text>
+              <Text style={styles.subtitleText}>Essential parts to build your dream PC</Text>
             }
             {categoryName.toLowerCase() === 'peripherals' && 
-              <Text style={styles.subtitleText}>Our top-selling products by demand</Text>
+              <Text style={styles.subtitleText}>Keyboards, mice, headsets, and more</Text>
             }
             {categoryName.toLowerCase() === 'furniture' && 
-              <Text style={styles.subtitleText}>Our top-selling products by demand</Text>
+              <Text style={styles.subtitleText}>Chairs and desks built for comfort</Text>
+            }
+            {categoryName.toLowerCase() === 'accessories' && 
+              <Text style={styles.subtitleText}>Extra gear to complete your setup</Text>
             }
            
         </View>
@@ -164,52 +181,48 @@ const styles = StyleSheet.create({
         backgroundColor: THEME.background 
     },
     header: { 
-        backgroundColor: THEME.primary, 
-        flexDirection: 'row', 
-        alignItems: 'center', 
-        paddingHorizontal: 16,
-        paddingVertical: 10, 
-        gap: 12, // Gap between elements
-    },
-    headerIconWrapper: {
-        padding: 4, // Add padding to make icons easily tappable
-    },
-    searchContainer: { 
-        flex: 1,
-        flexDirection: 'row', 
-        alignItems: 'center', 
-        backgroundColor: THEME.cardBackground, 
-        borderRadius: 15, // More rounded search bar
-        height: 44, // Taller search bar
-    },
-    searchIcon: {
-        marginLeft: 12, // Icon slightly more to the right
-    },
-    searchInput: { 
-        flex: 1, 
-        paddingHorizontal: 10, 
-        fontSize: 14, // Slightly larger font size
-        color: THEME.text ,
-        height: '100%', // Ensure input fills the container height
-    },
-    badgeContainer: {
-        position: 'absolute',
-        top: -5,
-        right: -8,
-        backgroundColor: THEME.background, // Background of the badge itself
-        borderRadius: 10, // More rounded badge
-        width: 20, // Larger badge
-        height: 20, // Larger badge
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderWidth: 1.5, // Slightly thicker border
-        borderColor: THEME.primary, // Red border for contrast
-    },
-    badgeText: {
-        color: THEME.primary,
-        fontSize: 12,
-        fontFamily: 'Rubik-Bold',
-    },
+  backgroundColor: THEME.primary, 
+  flexDirection: 'row', 
+  alignItems: 'center', 
+  justifyContent: 'space-between', // separate left & right
+  paddingHorizontal: 16,
+  paddingVertical: 10, 
+},
+
+rightIcons: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 15, // spacing between search, cart, account
+},
+
+headerIconWrapper: {
+  padding: 0, // tappable padding
+},
+
+searchIconContainer: {
+  padding: 5,
+},
+
+badgeContainer: {
+  position: 'absolute',
+  top: -5,
+  right: -8,
+  backgroundColor: '#EE2323',
+  borderRadius: 10,
+  width: 20,
+  height: 20,
+  justifyContent: 'center',
+  alignItems: 'center',
+  borderWidth: 1.5,
+  borderColor: THEME.primary,
+},
+
+badgeText: {
+  color: '#FFFFFF',
+  fontSize: 10,
+  fontWeight: 'bold',
+},
+
     titleContainer: {
         paddingHorizontal: 20,
         paddingVertical: 18, // Increased vertical padding

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   View,
-  Text,
+  Text, // Ensure Text is imported
   StyleSheet,
   SafeAreaView,
   TextInput,
@@ -9,7 +9,8 @@ import {
   TouchableOpacity,
   Image,
   StatusBar,
-  Platform
+  Platform,
+  
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useCart } from '../context/CartContext';
@@ -21,9 +22,8 @@ import Item from '../data/Item.json';
 // Import components
 import BannerSlider from '../Components/BannerSlider';
 import CategoryList from '../Components/CategoryList';
-// REMOVED: import ProductSection from '../Components/ProductSection'; // We will use this only for generic sections if needed
-import BestSellerSection from '../Components/BestSellerSection'; // NEW
-import PreBuiltSection from '../Components/PreBuiltSection';     // NEW
+import BestSellerSection from '../Components/BestSellerSection'; 
+import PreBuiltSection from '../Components/PreBuiltSection';     
 import ProductCard from '../Components/ProductCard';
 
 import * as SplashScreen from 'expo-splash-screen';
@@ -31,8 +31,8 @@ import * as SplashScreen from 'expo-splash-screen';
 SplashScreen.preventAutoHideAsync();
 
 const THEME = {
-  primary: '#E31C25',
-  background: '#FFFFFF',
+  primary: '#074ec2',
+  background: '#FAFAFA',
   text: '#1C1C1C',
   cardBackground: '#FFFFFF',
   icons: '#1C1C1C'
@@ -48,10 +48,10 @@ const HomeScreen = ({ navigation }) => {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [categories, setCategories] = useState([]);
-  
+
   const [bestSellerProducts, setBestSellerProducts] = useState([]);
   const [preBuiltProducts, setPreBuiltProducts] = useState([]);
-  const [allProductsDisplay, setAllProductsDisplay] = useState([]); // Renamed to avoid confusion with original Item
+  const [allProductsDisplay, setAllProductsDisplay] = useState([]); 
   const { itemCount } = useCart();
 
   useEffect(() => {
@@ -63,13 +63,11 @@ const HomeScreen = ({ navigation }) => {
     const uniqueCategories = [...new Set(processedItems.map(item => item.category.name))];
     setCategories(uniqueCategories);
     
-    // Filter Best Seller based on 'isBestSeller' property (assuming you have this in your JSON)
-    // If 'isBestSeller' is not in your JSON, you can use the rate >= 4.5 logic here as well.
-    setBestSellerProducts(processedItems.filter(p => p.isBestSeller).slice(0, 8)); // Use your actual best seller logic
+    setBestSellerProducts(processedItems.filter(p => p.isBestSeller).slice(0, 8));
     
     setPreBuiltProducts(processedItems.filter(p => p.category.name && p.category.name.toLowerCase() === 'pre-built').slice(0, 8));
     
-    setAllProductsDisplay(processedItems); // Initial load for "All Products"
+    setAllProductsDisplay(processedItems);
   }, []);
 
   useEffect(() => {
@@ -77,7 +75,7 @@ const HomeScreen = ({ navigation }) => {
       const filtered = Item.filter(p => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
       setAllProductsDisplay(filtered);
     } else {
-      setAllProductsDisplay(Item); // Reset to all items when search is cleared
+      setAllProductsDisplay(Item);
     }
   }, [searchQuery]);
 
@@ -86,56 +84,45 @@ const HomeScreen = ({ navigation }) => {
   }
 
   return (
-    
     <SafeAreaView style={styles.container}>
-      
       <View style={styles.header}>
-      <View style={styles.searchWrapper}>
-        <Image
-          source={require('../assets/pcrexlogo.png')}
-          style={styles.logo}
-          resizeMode="contain"
-        />
-        <View style={styles.searchContainer}>
-                  <Icon name="magnify" size={22} color="#888" style={{ marginLeft: 8 }} />
-                  <TextInput
-                    style={styles.searchInput}
-                    placeholder="Search all products..."
-                    placeholderTextColor="#888"
-                    value={searchQuery}
-                    onChangeText={setSearchQuery}
-                  />
-                </View>
-      </View>
-
-      {/* Cart Icon */}
-      <TouchableOpacity onPress={() => navigation.navigate('Cart')}>
-        <View>
-          <Icon name="cart-outline" size={24} color={THEME.icons} />
-          {itemCount > 0 && (
-            <View style={styles.badgeContainer}>
-              <Text style={styles.badgeText}>{itemCount}</Text>
-            </View>
-          )}
+        <View style={styles.leftHeader}>
+          <Image
+            source={require('../assets/PCREXBIGLOGOMOBILE.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
         </View>
-      </TouchableOpacity>
 
-      {/* Account Icon */}
-      <TouchableOpacity onPress={() => navigation.navigate('Account')}>
-        <Icon name="account-outline" size={26} color={THEME.icons} style={styles.headerIcon} />
-      </TouchableOpacity>
-    </View>
+        <View style={styles.rightHeader}>
+          <TouchableOpacity onPress={() => navigation.navigate('SearchProduct')} style={styles.searchIconContainer}>
+            <Icon name="magnify" size={26} color={THEME.icons} />
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => navigation.navigate('Cart')} style={styles.headerIcon}>
+            <View>
+              <Icon name="cart-outline" size={26} color={THEME.icons} />
+              {itemCount > 0 && (
+                <View style={styles.badgeContainer}>
+                  <Text style={styles.badgeText}>{itemCount}</Text>
+                </View>
+              )}
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={() => navigation.navigate('Account')} style={styles.headerIcon}>
+            <Icon name="account-outline" size={26} color={THEME.icons} />
+          </TouchableOpacity>
+        </View>
+      </View>
       
       <ScrollView>
         <BannerSlider />
         
-        {/* categories sections */}
         <CategoryList categories={categories} navigation={navigation} />
 
-        {/* bestSellerProducts sections */}
         <BestSellerSection data={bestSellerProducts} navigation={navigation} />
 
-         {/* preBuiltProducts sections */}
         <PreBuiltSection data={preBuiltProducts} navigation={navigation} />
         
         <View style={styles.sectionContainer}>
@@ -143,7 +130,7 @@ const HomeScreen = ({ navigation }) => {
                 <Text style={styles.sectionTitle}>Just For You</Text>
             </View>
             <View style={styles.allProductsGrid}>
-                {allProductsDisplay.map(item => ( // Use allProductsDisplay here
+                {allProductsDisplay.map(item => (
                   <View key={item.id} style={styles.gridCardContainer}>
                     <ProductCard product={item} onPress={() => navigation.navigate('ProductDetails', { product: item })} />
                   </View>
@@ -161,68 +148,50 @@ const HomeScreen = ({ navigation }) => {
 }; 
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: THEME.background, paddingBottom: Platform.OS === 'ios' ? 80 : 60},
+  container: { flex: 1, backgroundColor: THEME.background, paddingBottom: Platform.OS === 'andriod' ? 80 : 70},
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 12,
+    paddingHorizontal: 16,
     paddingVertical: 10,
-    backgroundColor: '#fff',
+    backgroundColor: THEME.background, // Changed from primaryBackground as it's not defined
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 5,
-    width: '100%',
   },
-  searchWrapper: {
+  leftHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
-    marginRight: 10,
+  },
+  rightHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   logo: {
-    width: 50,
+    width: 80,
     height: 50,
   },
-  searchContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: THEME.cardBackground,
-    borderRadius: 15,
-    height: 40,
-    borderWidth: 1,
-    borderColor: THEME.primary
+  searchIconContainer: {
+    padding: 5,
   },
-  searchInput: {
-    flex: 1,
-    paddingHorizontal: 10,
-    fontSize: 14,
-    
-    color: THEME.text
+  headerIcon: {
+    marginLeft: 15,
   },
   badgeContainer: {
     position: 'absolute',
-    right: -8,
-    top: -4,
-    backgroundColor: THEME.primary,
+    top: -5,
+    right: -5,
+    backgroundColor: 'red',
     borderRadius: 10,
-    width: 20,
-    height: 20,
+    width: 18,
+    height: 18,
     justifyContent: 'center',
     alignItems: 'center',
   },
   badgeText: {
-    color: THEME.background,
-    fontSize: 12,
+    color: 'white',
+    fontSize: 10,
     fontWeight: 'bold',
-  },
-  headerIcon: {
-    marginLeft: 15,
   },
   sectionContainer: {
     marginTop: 20,
@@ -245,9 +214,6 @@ const styles = StyleSheet.create({
   gridCardContainer: { width: '50%' },
   noResultsContainer: { alignItems: 'center', justifyContent: 'center', padding: 20, minHeight: 150 },
   noResultsText: { fontSize: 16, color: '#6c757d', fontFamily: 'Rubik-Regular' },
-
-
-  
 });
 
 export default HomeScreen;

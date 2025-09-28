@@ -1,51 +1,77 @@
+// CategoryList.js
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { useFonts } from 'expo-font'; // Import the useFonts hook
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // Import the Icon component
+import { useFonts } from 'expo-font';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useRoute } from '@react-navigation/native';
 
-// Define a mapping from category names to icon names
+// Icon mapping
 const categoryIcons = {
+  'All': 'apps', // dagdag natin icon for "All"
   'Components': 'memory',
   'Peripherals': 'keyboard-outline',
   'Furniture': 'desk',
-  'Pre-Built': 'desktop-tower-monitor'
+  'Pre-Built': 'desktop-tower-monitor',
+  'Accessories': 'usb'
 };
 
 const CategoryList = ({ categories, navigation }) => {
-   // Load custom fonts
-      const [fontsLoaded] = useFonts({
-        'Rubik-Regular': require('../assets/fonts/Rubik/static/Rubik-Regular.ttf'),
-        'Rubik-Bold': require('../assets/fonts/Rubik/static/Rubik-Bold.ttf'),
-        'Rubik-Medium': require('../assets/fonts/Rubik/static/Rubik-Medium.ttf'),
-        'Rubik-SemiBold': require('../assets/fonts/Rubik/static/Rubik-SemiBold.ttf'), // Make sure this font file exists
-      });
+  const route = useRoute();
 
-    // Wait until the fonts are loaded before rendering the screen
+  const [fontsLoaded] = useFonts({
+    'Rubik-Regular': require('../assets/fonts/Rubik/static/Rubik-Regular.ttf'),
+    'Rubik-Bold': require('../assets/fonts/Rubik/static/Rubik-Bold.ttf'),
+    'Rubik-Medium': require('../assets/fonts/Rubik/static/Rubik-Medium.ttf'),
+    'Rubik-SemiBold': require('../assets/fonts/Rubik/static/Rubik-SemiBold.ttf'),
+  });
+
   if (!fontsLoaded) {
-    return null; // Or you can return a loading indicator here
+    return null;
   }
+
+  // Current active category (kapag nasa CategoryProducts screen)
+  const activeCategory = route.name === 'CategoryProducts' ? route.params?.categoryName : null;
+
+  // Lagyan natin ng "All" option sa unahan
+  const allCategories = ['All', ...categories];
+
   return (
     <View style={styles.categorySectionContainer}>
       <Text style={styles.CategoriesText}>Categories</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoryScroll}>
-        {categories.map((cat, index) => (
-          <TouchableOpacity
-            key={index}
-            style={styles.categoryButton}
-            onPress={() => navigation.navigate('CategoryProducts', { categoryName: cat })}
-          >
-         
-            <View style={styles.buttonContent}>
-              
-              
-              <Icon name={categoryIcons[cat] || 'help-circle'} size={20} color="#FFFFFF" />
+        {allCategories.map((cat, index) => {
+          const isActive = cat === activeCategory || (cat === 'All' && route.name === 'Home');
 
-             
-              <Text style={styles.categoryText}>{cat}</Text>
-
-            </View>
-          </TouchableOpacity>
-        ))}
+          return (
+            <TouchableOpacity
+              key={index}
+              style={[styles.categoryButton, 
+                isActive ? styles.activeButton : styles.inactiveButton
+              ]}
+              onPress={() => {
+                if (cat === 'All') {
+                  navigation.navigate('Home', { categoryName: 'All Products' });
+                } else {
+                  navigation.navigate('CategoryProducts', { categoryName: cat });
+                }
+              }}
+            >
+              <View style={styles.buttonContent}>
+                <Icon 
+                  name={categoryIcons[cat] || 'help-circle'} 
+                  size={20} 
+                  color={isActive ? '#FFFFFF' : '#074ec2'} 
+                />
+                <Text style={[
+                  styles.categoryText, 
+                  { color: isActive ? '#FFFFFF' : '#074ec2' }
+                ]}>
+                  {cat}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          );
+        })}
       </ScrollView>
     </View>
   );
@@ -55,23 +81,33 @@ const styles = StyleSheet.create({
   categorySectionContainer: { marginVertical: 16 },
   CategoriesText:{ fontSize: 18, fontFamily: 'Rubik-Medium', paddingHorizontal: 16, marginBottom: 12},
   categoryScroll: { paddingHorizontal: 16 },
+
   categoryButton: {
-    backgroundColor: '#E31C25',
     borderRadius: 15,
     marginRight: 10,
     paddingHorizontal: 15,
-    height: 50, // Pwedeng i-adjust ang height kung kailangan
+    height: 50,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#FFFFFF',
   },
+
+  activeButton: {
+    backgroundColor: '#074ec2',
+    borderColor: '#074ec2',
+  },
+
+  inactiveButton: {
+    backgroundColor: 'transparent',
+    borderColor: '#074ec2',
+  },
+
   buttonContent: {
-    flexDirection: 'row', // Dinagdag para maging horizontal ang alignment
+    flexDirection: 'row',
     alignItems: 'center'
   },
+
   categoryText: {
-    color: '#FFFFFF',
     fontFamily: 'Rubik-SemiBold',
     fontSize: 14,
     marginLeft: 5
